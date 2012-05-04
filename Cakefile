@@ -29,5 +29,7 @@ task 'build', 'Create a minified files for distribution', ->
     spawn 'coffee', ['-o', 'lib/', '-c', 'src/']
     one = spawn 'r.js', ['-o', 'build-bundled.js']
     two = spawn 'r.js', ['-o', 'build-standalone.js']
+    three = spawn 'r.js', ['-o', 'build-normal.js']
     out one
     out two
+    out three
