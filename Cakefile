@@ -25,8 +25,10 @@ task 'develop', 'Run a dev server', ->
 
     spawn 'google-chrome', ['http://localhost:8888/test/test.html']
 
-task 'build', 'Create a minified files for distribution', ->
+task 'compile', 'Compile coffee files', ->
     spawn 'coffee', ['-o', 'lib/', '-c', 'src/']
+
+task 'build', 'Create a minified files for distribution', ->
     one = spawn 'r.js', ['-o', 'build-bundled.js']
     two = spawn 'r.js', ['-o', 'build-standalone.js']
     three = spawn 'r.js', ['-o', 'build-normal.js']
