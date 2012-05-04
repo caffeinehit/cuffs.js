@@ -158,6 +158,7 @@ define ['./template'], ({Binding, Template})->
             @contexts = []
 
         renderIterable: (context, iterable)->
+            iterable = iterable or []
             @nodes = []
             @contexts.shift().destroy() while @contexts.length > 0
 

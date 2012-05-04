@@ -4,6 +4,17 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
     {Context} = context
     {Template} = template
 
+    lookup = (classpath)->
+        parts = classpath.split '.'
+        current = this
+
+        for part in parts
+            current = current[part]
+
+            if not current?
+                throw new Error "Not found: #{classpath}"
+
+        current
 
     class Application
         @__id__: 0
@@ -15,16 +26,14 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
 
         initControllers: ()->
             @controllers = {}
-            walk @node, (node)->
+            walk @node, (node)=>
                 if not ctrl = node.getAttribute 'data-controller'
                     return
 
                 id = Application.id()
-                context = @context.new()
                 Controller = lookup node.getAttribute 'data-controller'
-
-                controller = new Controller context
-                @controllers[id] = id
+                controller = new Controller @context
+                @controllers[id] = controller
                 $(node).attr('data-controller-id', id)
 
 

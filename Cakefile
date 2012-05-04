@@ -11,6 +11,12 @@ etags = (obj)->
     obj.stdout.on 'data', ->
         spawn 'etags', ['src/']
 
+task 'watch', 'Watch and compile', ->
+    coffee = spawn 'coffee', ['-w', '-o', 'lib/', '-c', 'src/']
+    coffee.stdout.on 'data', ->
+        spawn 'r.js', ['-o', 'build-normal.js']
+    out coffee
+
 task 'develop', 'Run a dev server', ->
     httpd = spawn 'python', ['-m', 'SimpleHTTPServer', '8888']
     coffee = spawn 'coffee', ['-w', '-o', 'lib/', '-c', 'src/']
@@ -21,7 +27,7 @@ task 'develop', 'Run a dev server', ->
 
     coffee.stdout.on 'data', ->
         spawn 'etags', ['src/']
-        invoke 'build'
+        spawn 'r.js', ['-o', 'build-normal.js']
 
     spawn 'google-chrome', ['http://localhost:8888/test/test.html']
 
