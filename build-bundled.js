@@ -5,5 +5,5 @@
     {name: 'cuffs/main',
     include: ['requirejs/require.min']}    
   ],
-  out: "build/cuffs.min.js"
+  out: "cuffs.min.js"
 })

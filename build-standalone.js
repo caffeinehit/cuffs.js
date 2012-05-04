@@ -4,5 +4,5 @@
   modules: [
     {name: 'cuffs/main'}    
   ],
-  out: "build/cuffs.standalone.min.js"
+  out: "cuffs.standalone.min.js"
 })
