@@ -1,0 +1,3 @@
+# Cuffs.js
+
+Easy frontend.
