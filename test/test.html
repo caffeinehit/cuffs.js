@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Template test</title>
+  <link rel="stylesheet" href="mocha.css" />
+  <script type="text/javascript" src="jquery.min.js"></script>
+  <script type="text/javascript" src="expect.js"></script>
+  <script type="text/javascript" src="mocha.js"></script>
+  <script type="text/javascript">mocha.setup('bdd');</script>
+  <script type="text/javascript">
+    var require = {
+    	baseUrl: '/test',
+    	paths: {
+    		'cuffs': '/lib/cuffs'
+    	}
+    };
+  </script>
+  <script type="text/javascript" src="../lib/requirejs/require.js" data-main="test"></script>
+</head>
+<body>
+  <div id="mocha"></div>
+  <div id="walking_the_dom_tree">
+    <ul>
+      <li>One</li>
+      <li>Two</li>
+      <li>Three</li>
+    </ul>
+    <ul>
+      <li>Four</li>
+      <li>Five</li>
+      <li>Six</li>
+    </ul>
+  </div>
+  <div id="matching-bindings">
+    <p>No directives</p>
+    <p data-binding1="binding1"></p>
+    <p data-binding2="binding2" data-binding3="binding3"></p>
+  </div>
+  <div id="data-show" data-show="show">Show, or not</div>
+  <div id="data-bind" data-bind="bind"></div>
+  <input id="data-bind-text" type="text" value="" data-bind="bind" />
+  <input id="data-bind-checkbox" type="checkbox" value="" data-bind="bind" />
+  <div id="data-set" data-set="foo=bar" />
+  <div id="data-activate">
+    <a href="#" data-activate="active==one">one</a>
+    <a href="#" data-activate="active==two">two</a>
+  </div>
+  <div id="data-attr" data-attr="title=title"></div>
+  <div id="data-or" data-or="predicate ? true : false"></div>
+  <div id="dom_template">
+    <p id="dom_template_name">Rendered with: <span data-bind="name"></span></p>
+    <ul id="dom_template_musicians">
+      <li data-loop="musician in musicians" data-show="musician.visible">
+        Musician: <span data-bind="musician.name"></span>
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
