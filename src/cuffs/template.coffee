@@ -2,7 +2,7 @@ define ['./compiler', './context'], (compiler, context) ->
     {Context} = context
 
     DOM_REGEX = /[^>]+>/
-    BINDING_REGEX = /data\-[\w\d]+/g
+    BINDING_REGEX = /data\-[\w\d\-]+/g
     BINDINGS = []
 
     class Template

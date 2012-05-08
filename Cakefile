@@ -14,6 +14,7 @@ etags = (obj)->
 task 'watch', 'Watch and compile', ->
     coffee = spawn 'coffee', ['-w', '-o', 'lib/', '-c', 'src/']
     coffee.stdout.on 'data', ->
+        console.log 'Building build-normal.js'
         spawn 'r.js', ['-o', 'build-normal.js']
     out coffee
 

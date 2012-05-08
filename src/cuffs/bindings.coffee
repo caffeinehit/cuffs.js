@@ -4,18 +4,38 @@ define ['./template'], ({Binding, Template})->
         # Make element visible depending if the context's attribute
         # is not falsy, eg:
         # <div data-show="todo.done"></div>
+        # <div data-show="todo.done==0"></div>
+        # <div data-show="todo.done!=0"></div>
 
         @bind 'data-show'
 
+        constructor: (@node)->
+            super node
+            notEqual = /.*!=.*/
+            equal = /.*==.*/
+
+            if notEqual.test @attr
+                [@attrName, @attrValue] = @attr.split("!=")
+                @test = (value)=>
+                    return @attrValue != value
+            else if equal.test @attr
+                [@attrName, @attrValue] = @attr.split("==")
+                @test = (value)=>
+                    return @attrValue == value
+            else
+                @attrName = @attr
+                @test = (value)->
+                    return value? and value
+
         toggle: (value)->
-            if value
+            if @test value
                 @node.style.display = ""
             else
                 @node.style.display = "none"
 
         applyContext: (context)->
-            context.watch @attr, (value)=> @toggle value
-            @toggle context.get @attr
+            context.watch @attrName, (value)=> @toggle value
+            @toggle context.get @attrName
             this
 
     class DataAttr extends Binding
@@ -101,9 +121,31 @@ define ['./template'], ({Binding, Template})->
     class DataClick extends Binding
         # Call a method on the context when the tag is clicked, eg:
         # <a data-click="markDone" href="#">Click Me</a>
+        @bind 'data-click'
 
         applyContext: (context)->
-            $(@node).click => context.get(@attr)(@node)
+            $(@node).click => context.get(@attr)(context, @node)
+            this
+
+    class DataClickSet extends Binding
+        # Set a value on the model when clicking, eg
+        # <a data-click-set="todo.done=false">
+        # <a data-click-set="todo.done=true">
+        # <a data-click-set="todo.done=yep it's done">
+
+        @bind 'data-click-set'
+        constructor: (node)->
+            super node
+            [@attrName, @attrValue] = @attr.split('=')
+
+        applyContext: (context)->
+            $(@node).click =>
+                if @attrValue == 'true'
+                    context.set @attrName, true
+                else if @attrValue == 'false'
+                    context.set @attrName, false
+                else
+                    context.set @attrName, @attrValue
             this
 
     class DataSet extends Binding
