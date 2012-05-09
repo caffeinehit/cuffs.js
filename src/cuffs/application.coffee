@@ -19,28 +19,46 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
     class Application
         @__id__: 0
         @id: -> ++ Application.__id__
+
+        _controller_ids: {}
+        _controller_names: {}
+        _controller_ctor: {}
+
         constructor: (@node)->
             @context = new Context
             @initControllers()
             @initTemplate()
 
         initControllers: ()->
-            @controllers = {}
+
             walk @node, (node)=>
-                if not ctrl = node.getAttribute 'data-controller'
+                if not classpath = node.getAttribute 'data-controller'
                     return
 
                 id = Application.id()
-                Controller = lookup node.getAttribute 'data-controller'
-                controller = new Controller @context
-                @controllers[id] = controller
+                Controller = lookup classpath
+                controller = new Controller this, @context
+                @_controller_ids[id] = controller
+                @_controller_names[classpath] = controller
+                @_controller_ctor[Controller] = controller
                 $(node).attr('data-controller-id', id)
-
-
 
         initTemplate: ()->
             @template = new Template @node
             @template.applyContext @context
+
+        getController: (Controller)->
+            # Return a controller by constructor
+            @_controller_ctor[Controller]
+
+        getControllerById: (id)->
+            # Return a controller by id
+            @_controller_ids[id]
+
+        getControllerByName: (name)->
+            # Return a controller by classpath
+            @_controller_names[name]
+
 
     return {
         Application: Application

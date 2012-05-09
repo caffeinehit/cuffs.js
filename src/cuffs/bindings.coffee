@@ -1,4 +1,4 @@
-define ['./template'], ({Binding, Template})->
+define ['./template', './utils'], ({Binding, Template}, utils)->
 
     class DataShow extends Binding
         # Make element visible depending if the context's attribute
@@ -37,6 +37,7 @@ define ['./template'], ({Binding, Template})->
             context.watch @attrName, (value)=> @toggle value
             @toggle context.get @attrName
             this
+
 
     class DataAttr extends Binding
         # Sets an attribute on the current node, eg:
@@ -91,6 +92,8 @@ define ['./template'], ({Binding, Template})->
             super @node
 
         setValue: (value)->
+            if utils.typeOf(value) == "function"
+                value = value()
             if not @type?
                 @node.innerHTML = value
             else if @type == 'text'
@@ -177,6 +180,40 @@ define ['./template'], ({Binding, Template})->
             context.watch @watchName, (value)=> @activate value
             $(@node).click ()=> context.set @watchName, @watchValue
             @activate context.get @watchName
+
+    class DataStyle extends Binding
+        # Adds inline styling to a node, eg:
+        # <a data-style="background:#{todo.color};font-size:#{todo.priority}em;"
+
+        @bind 'data-style'
+        regexp: /#\{(.*?)\}/g
+        constructor: (node)->
+            super node
+            @styles = {}
+
+            styles = @attr.split(";")
+
+            for style in styles
+                continue if not style.trim()
+                [name, raw] = style.split(":")
+                objects = raw.match @regexp
+                @styles[name] = raw: raw, objects: objects
+
+        setValue: (name, value)->
+            $(@node).css(name, value)
+
+        doStyle: (context, name, raw, objects)->
+            for object in objects
+                raw = raw.replace object, context.get(object.replace(@regexp, '$1'))
+            @setValue name, raw
+
+        applyContext: (context)->
+            for own name, {raw, objects} of @styles
+                for object in objects
+                    object = object.replace(@regexp, '$1')
+                    context.watch object, (value)=>
+                        @doStyle context, name, raw, objects
+                @doStyle context, name, raw, objects
 
 
     class DataLoop extends Binding
