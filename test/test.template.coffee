@@ -171,7 +171,7 @@ define ['cuffs/compiler', 'cuffs/template', 'cuffs/context', 'cuffs/bindings'], 
             dom_template_musicians = document.getElementById 'dom_template_musicians'
 
             it 'should render a node with context', ->
-                tpl = new Template(dom_template).applyContext context
+                tpl = new Template(dom_template).compile().applyContext context
                 expect(dom_template_name.innerHTML).to.be 'Rendered with: <span data-bind="name">Frontend.js</span>'
                 expect(dom_template_musicians.childElementCount).to.be 2
                 expect(dom_template_musicians.firstElementChild.innerHTML.trim()).to.be '

@@ -93,13 +93,12 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
 
         setValue: (value)->
             if not @type?
-                @node.innerHTML = value
+                if value?
+                    @node.innerHTML = value
             else if @type == 'text'
                 @node.value = value
             else if @type == 'checkbox'
                 $(@node).attr 'checked', value
-            else
-                throw new Error "Unknown type to bind to: #{@type}"
             this
 
         getValue: ()->
@@ -223,7 +222,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
 
         constructor: (node)->
             @attr = node.getAttribute @name
-            @parentElement = node.parentElement
+            @node = @parentElement = node.parentElement
             @template = node.cloneNode true
 
             $(@template).removeAttr 'data-loop'
@@ -240,7 +239,9 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             @nodes = []
             @contexts.shift().destroy() while @contexts.length > 0
 
-            @parentElement.innerHTML = ''
+            $(@parentElement).empty()
+            @templates = []
+
 
             for element in iterable
                 ctx = context.new()
@@ -249,7 +250,8 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
 
                 clone = @template.cloneNode true
                 @nodes.push clone
-                tpl = new Template clone
+                tpl = new Template(clone).compile()
+                @templates.push tpl
                 # Creating a template instance does not take
                 # into account bindings on the root element
                 # so we have to do that manually
@@ -268,15 +270,6 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             this
 
 
-
-    class DataPushState extends Binding
-        @bind 'data-push-state'
-
-        applyContext: (context)->
-            $(@node).click ()->
-                title = $(this).attr 'title'
-                href = $(this).attr 'href'
-                History.pushState {}, title, href
 
 
     return {

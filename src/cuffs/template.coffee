@@ -1,4 +1,4 @@
-define ['./compiler', './context'], (compiler, context) ->
+define ['./compiler', './context', './utils'], (compiler, context, utils) ->
     {Context} = context
 
     DOM_REGEX = /[^>]+>/
@@ -7,20 +7,34 @@ define ['./compiler', './context'], (compiler, context) ->
 
     class Template
         # A template holds all bindings that need to be rendered.
-        constructor: (@node, @bindings = [])->
-            compiler.walk @node, (node)=>
+        constructor: (@node)->
+            @bindings = []
+            @callbacks = []
+
+        addCallback: (callback)->
+            # Callbacks that are called on each binding
+            # we encounter while compiling the template
+            @callbacks.push callback
+
+        compile: ()->
+            compiler.walk @node, (node, depth)=>
                 {stop, bindings} = Binding.init node
-                @push binding for binding in bindings
+                for binding in bindings
+                    @push binding
+                    for callback in @callbacks
+                        callback node, binding, depth
                 return compiler.STOP_DESCENT if stop
+            this
 
         push: (binding)->
             @bindings.push binding
             this
 
         applyContext: (context)->
-            if context !instanceof Context
-                context = new Context context
-            binding.applyContext context for binding in @bindings
+            if utils.typeOf(context) == "function"
+                binding.applyContext context(binding) for binding in @bindings
+            else
+                binding.applyContext context for binding in @bindings
             this
 
     class Binding

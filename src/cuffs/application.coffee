@@ -21,9 +21,9 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
         @id: -> ++ Application.__id__
 
         _controller_ids: {}
-        _controller_names: {}
+        _controller_context_ids: {}
         _controller_ctor: {}
-        _controller_depths: {}
+
 
         constructor: (@node)->
             @context = new Context
@@ -37,22 +37,32 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
                     return
 
                 id = Application.id()
+                context = @getParentContext(node).new()
                 Controller = lookup classpath
-                controller = new Controller this, @context.new()
-                @_controller_ids[id] = controller
-                @_controller_names[classpath] = controller
-                @_controller_ctor[Controller] = controller
+                controller = new Controller this, context
 
-                if @_controller_depths[depth]?
-                    @_controller_depths[depth].push controller
-                else
-                    @_controller_depths[depth] = [controller]
+                @_controller_ids[id] = controller
+                @_controller_context_ids[id] = context
+                @_controller_ctor[Controller] = controller
 
                 $(node).attr('data-controller-id', id)
 
+            for own id, ctrl of @_controller_ids
+                ctrl.init() if ctrl.init?
+
         initTemplate: ()->
-            @template = new Template @node
-            @template.applyContext @context
+            @template = new Template(@node).compile()
+            @template.applyContext (binding)=>
+                @getParentContext binding.node
+
+        getParentContext: (node)->
+            if id = node.getAttribute('data-controller-id')
+                return @_controller_context_ids[id]
+            while node = node.parentElement
+                break if not node?
+                if id = node.getAttribute('data-controller-id')
+                    return @_controller_context_ids[id]
+            return @context
 
         getController: (Controller)->
             # Return a controller by constructor
@@ -65,7 +75,6 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
         getControllerByName: (name)->
             # Return a controller by classpath
             @_controller_names[name]
-
 
     return {
         Application: Application

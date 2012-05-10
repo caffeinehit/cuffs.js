@@ -96,6 +96,9 @@ define ['cuffs/utils'], (utils) ->
                     current = current[part]
                 return returnFunc current
 
+        hasProp: (name)->
+            {}.hasOwnProperty.call this, name
+
         set: (name, value)->
             # Set the object referenced by `name` on the context. Allow
             # for dotted notation.
@@ -112,7 +115,15 @@ define ['cuffs/utils'], (utils) ->
                 for part in parts[0..parts.length-2]
                     current = current[part]
                 current[parts[parts.length-1]] = value
-            @apply name
+
+
+            if @hasProp parts[0]
+                return @apply name
+            ctx = this
+            while ctx = ctx.parent()
+                continue if not ctx.hasProp parts[0]
+                return ctx.apply name
+
 
     return {
         Context: Context
