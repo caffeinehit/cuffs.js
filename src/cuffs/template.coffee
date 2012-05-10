@@ -54,8 +54,6 @@ define ['./compiler', './context'], (compiler, context) ->
             BINDINGS[b] for b in bindings.filter (b)-> BINDINGS[b]?
 
         @init: (node)->
-            # Given a `Template` instance, get all bindings from `node`
-            # and push them into `template`.
             # Returns an object `{stop: true/false, bindings: []}`
             # where `stop` indicates if the recursion should be stopped
             stop = false

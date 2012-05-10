@@ -92,8 +92,6 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             super @node
 
         setValue: (value)->
-            if utils.typeOf(value) == "function"
-                value = value()
             if not @type?
                 @node.innerHTML = value
             else if @type == 'text'
@@ -178,7 +176,8 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
 
         applyContext: (context)->
             context.watch @watchName, (value)=> @activate value
-            $(@node).click ()=> context.set @watchName, @watchValue
+            $(@node).click ()=>
+                context.set @watchName, @watchValue
             @activate context.get @watchName
 
     class DataStyle extends Binding

@@ -23,6 +23,7 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
         _controller_ids: {}
         _controller_names: {}
         _controller_ctor: {}
+        _controller_depths: {}
 
         constructor: (@node)->
             @context = new Context
@@ -31,16 +32,22 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
 
         initControllers: ()->
 
-            walk @node, (node)=>
+            walk @node, (node, depth)=>
                 if not classpath = node.getAttribute 'data-controller'
                     return
 
                 id = Application.id()
                 Controller = lookup classpath
-                controller = new Controller this, @context
+                controller = new Controller this, @context.new()
                 @_controller_ids[id] = controller
                 @_controller_names[classpath] = controller
                 @_controller_ctor[Controller] = controller
+
+                if @_controller_depths[depth]?
+                    @_controller_depths[depth].push controller
+                else
+                    @_controller_depths[depth] = [controller]
+
                 $(node).attr('data-controller-id', id)
 
         initTemplate: ()->

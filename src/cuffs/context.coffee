@@ -1,4 +1,4 @@
-define ->
+define ['cuffs/utils'], (utils) ->
 
     class Context
         __parent__: null
@@ -62,6 +62,14 @@ define ->
                 child.apply attr for child in this.__children__
             this
 
+        parent: ()->
+            this.__parent__
+
+        root: ()->
+            if this.__parent__?
+                return this.__parent__.root()
+            return this
+
         get: (name)->
             # Pull the object referenced by `name` from the context. Allow
             # for dotted notation.
@@ -73,15 +81,20 @@ define ->
 
             parts = name.split '.'
 
+            returnFunc = (value)->
+                if utils.typeOf(value) == "function"
+                    return value()
+                return value
+
             if parts.length == 1
-                return @[name]
+                return returnFunc @[name]
             else
                 current = this
                 for part in parts
                     if not current?
                         return null
                     current = current[part]
-                return current
+                return returnFunc current
 
         set: (name, value)->
             # Set the object referenced by `name` on the context. Allow
