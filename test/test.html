@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Template test</title>
   <link rel="stylesheet" href="mocha.css" />
-  <script type="text/javascript" src="jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" src="expect.js"></script>
   <script type="text/javascript" src="mocha.js"></script>
   <script type="text/javascript">mocha.setup('bdd');</script>
@@ -41,13 +41,16 @@
   <div id="data-bind" data-bind="bind"></div>
   <input id="data-bind-text" type="text" value="" data-bind="bind" />
   <input id="data-bind-checkbox" type="checkbox" value="" data-bind="bind" />
+  <a href="#" id="data-click" data-click="handler" ></a>
   <div id="data-set" data-set="foo=bar" />
   <div id="data-activate">
     <a href="#" data-activate="active==one">one</a>
     <a href="#" data-activate="active==two">two</a>
   </div>
+  <p id="data-style" data-style="background-color: #{background-color}; color: #{color}">Test</p>
   <div id="data-attr" data-attr="title=title"></div>
   <div id="data-or" data-or="predicate ? true : false"></div>
+  <div id="data-template" data-template="data-template"><p data-bind="text"></p></div>
   <div id="dom_template">
     <p id="dom_template_name">Rendered with: <span data-bind="name"></span></p>
     <ul id="dom_template_musicians">

@@ -41,7 +41,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
 
     class DataAttr extends Binding
         # Sets an attribute on the current node, eg:
-        # <img src="foo.png" data-set-attr="alt=img.desc" />
+        # <img src="foo.png" data-attr="alt=img.desc" />
         @bind 'data-attr'
         constructor: (node)->
             super node
@@ -124,29 +124,9 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         @bind 'data-click'
 
         applyContext: (context)->
-            $(@node).click => context.get(@attr)(context, @node)
+            $(@node).click => context.get(@attr)(@node)
             this
 
-    class DataClickSet extends Binding
-        # Set a value on the model when clicking, eg
-        # <a data-click-set="todo.done=false">
-        # <a data-click-set="todo.done=true">
-        # <a data-click-set="todo.done=yep it's done">
-
-        @bind 'data-click-set'
-        constructor: (node)->
-            super node
-            [@attrName, @attrValue] = @attr.split('=')
-
-        applyContext: (context)->
-            $(@node).click =>
-                if @attrValue == 'true'
-                    context.set @attrName, true
-                else if @attrValue == 'false'
-                    context.set @attrName, false
-                else
-                    context.set @attrName, @attrValue
-            this
 
     class DataSet extends Binding
         # Sets a certain value on the model. Sometimes useful. Eg:
@@ -198,7 +178,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
                 @styles[name] = raw: raw, objects: objects
 
         setValue: (name, value)->
-            $(@node).css(name, value)
+            $(@node).css(name.trim(), value.trim())
 
         doStyle: (context, name, raw, objects)->
             for object in objects
@@ -212,6 +192,38 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
                     context.watch object, (value)=>
                         @doStyle context, name, raw, objects
                 @doStyle context, name, raw, objects
+
+    class DataTemplate extends Binding
+        # Creates a reusable template and stores it in the context
+        # under it's attribute value, eg:
+        #
+        # <div data-template="template1"></div>
+        #
+        # To render the template, you can query the context and call
+        # `render` which returns a new DOM node with the given context
+        # applied to it:
+        #
+        # $(body).append(context.get('template1').render(tplcontext))
+
+        @bind 'data-template'
+        stop: true
+        constructor: (node)->
+            @attr = @templateName = node.getAttribute @name
+            @node = node.parentElement
+            @template = node.cloneNode true
+            $(@template).removeAttr 'data-template'
+            $(node).remove()
+
+        applyContext: (context)->
+            context.set @templateName, this
+
+        render: (context)->
+            clone = @template.cloneNode true
+            tpl = new Template(clone).compile()
+            {bindings} = Binding.init clone
+            tpl.push b for b in bindings
+            tpl.applyContext context
+            return clone
 
 
     class DataLoop extends Binding
@@ -279,6 +291,8 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         DataLoop: DataLoop
         DataSet: DataSet
         DataActivate: DataActivate
+        DataStyle: DataStyle
         DataAttr: DataAttr
         DataOr: DataOr
+        DataTemplate: DataTemplate
     }

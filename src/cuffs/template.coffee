@@ -2,7 +2,7 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
     {Context} = context
 
     DOM_REGEX = /[^>]+>/
-    BINDING_REGEX = /data\-[\w\d\-]+/g
+    BINDING_REGEX = /\s(data\-[\w\d\-]+)/gim
     BINDINGS = []
 
     class Template
@@ -64,7 +64,7 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
             # Convenience function that returns all the node's binding
             # classes
             tag = node.outerHTML.match DOM_REGEX
-            bindings = tag[0].match(BINDING_REGEX) or []
+            bindings = (b.trim() for b in (tag[0].match(BINDING_REGEX) or []))
             BINDINGS[b] for b in bindings.filter (b)-> BINDINGS[b]?
 
         @init: (node)->
@@ -89,7 +89,7 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
 
     render = (node, object)->
         # Convenience function
-        new Template(node).applyContext(new Context object)
+        new Template(node).compile().applyContext(new Context object)
 
     render: render
     Template: Template

@@ -1,11 +1,10 @@
 define ['cuffs/utils'], (utils) ->
 
     class Context
-        __parent__: null
-        __children__: []
-        __observers__: {}
-
         constructor: (obj)->
+            @__parent__ = null
+            @__children__ = []
+            @__observers__ = {}
             for key, value of obj
                 this[key] = value
 
@@ -78,6 +77,9 @@ define ['cuffs/utils'], (utils) ->
             # `name` = 'todo' => @['todo']
             # `name` = 'todo.task' => @['todo']['task']
             # `name` = 'todo.task.priority' => @['todo']['task']
+            #
+            # If the value is a function, it is called and its return value
+            # returned.
 
             parts = name.split '.'
 
@@ -106,6 +108,8 @@ define ['cuffs/utils'], (utils) ->
             # `name` = 'todo' => @['todo'] = value
             # `name` = 'todo.task' => @['todo']['task'] = value
             # `name` = 'todo.task.priority' => @['todo']['task']['priority'] = value
+            #
+            # If the nested object does not exist yet, it's created on the fly.
             parts = name.split '.'
 
             if parts.length == 1
@@ -113,7 +117,7 @@ define ['cuffs/utils'], (utils) ->
             else
                 current = this
                 for part in parts[0..parts.length-2]
-                    current = current[part]
+                    current = current[part] or current[part] = {}
                 current[parts[parts.length-1]] = value
 
 
