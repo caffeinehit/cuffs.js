@@ -39,7 +39,7 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
                 id = Application.id()
                 context = @getParentContext(node).new()
                 Controller = lookup classpath
-                controller = new Controller this, context
+                controller = new Controller app: this, context: context
 
                 @_controller_ids[id] = controller
                 @_controller_context_ids[id] = context

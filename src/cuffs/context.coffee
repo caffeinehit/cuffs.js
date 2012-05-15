@@ -69,7 +69,7 @@ define ['cuffs/utils'], (utils) ->
                 return this.__parent__.root()
             return this
 
-        get: (name)->
+        get: (name, call = true)->
             # Pull the object referenced by `name` from the context. Allow
             # for dotted notation.
             # Examples:
@@ -79,12 +79,12 @@ define ['cuffs/utils'], (utils) ->
             # `name` = 'todo.task.priority' => @['todo']['task']
             #
             # If the value is a function, it is called and its return value
-            # returned.
+            # returned if `call` is `true`, else the function is returned.
 
-            parts = name.split '.'
+            parts = (part.trim() for part in name.split '.')
 
             returnFunc = (value)->
-                if utils.typeOf(value) == "function"
+                if utils.typeOf(value) == "function" and call == true
                     return value()
                 return value
 
@@ -110,7 +110,7 @@ define ['cuffs/utils'], (utils) ->
             # `name` = 'todo.task.priority' => @['todo']['task']['priority'] = value
             #
             # If the nested object does not exist yet, it's created on the fly.
-            parts = name.split '.'
+            parts = (part.trim() for part in name.split '.')
 
             if parts.length == 1
                 @[name] = value

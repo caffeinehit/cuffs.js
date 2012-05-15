@@ -4,13 +4,6 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template', 'cuffs/bindings', '
     {Template, Binding} = template
     {Application} = application
 
-    # Auto startup
-    apps = []
-    # $ ->
-    #     $('[data-app]').each ->
-    #         apps.push new Application this
-
-    # Register global namespace
     return this.Cuffs = {
         Application: Application
         compiler: compiler
@@ -20,5 +13,5 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template', 'cuffs/bindings', '
         utils: utils
         bindings: bindings
         controller: controller
-        apps: apps
+        apps: []
     }

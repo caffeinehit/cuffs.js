@@ -92,7 +92,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             super @node
 
         setValue: (value)->
-            if not @type?
+            if not @type or @type == ""?
                 if value?
                     @node.innerHTML = value
             else if @type == 'text'
@@ -102,7 +102,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             this
 
         getValue: ()->
-            if not @type?
+            if not @type or @type == ""?
                 @node.html()
             else if @type == 'text'
                 @node.value
@@ -121,10 +121,18 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
     class DataClick extends Binding
         # Call a method on the context when the tag is clicked, eg:
         # <a data-click="markDone" href="#">Click Me</a>
+        # <a data-click="markDone:todo.id" href="#">Click Me</a>
         @bind 'data-click'
 
+        constructor: (node)->
+            super node
+            [@funcName, @funcArgs] = @attr.split(':')
+            @funcArgs or= ''
+
         applyContext: (context)->
-            $(@node).click => context.get(@attr)(@node)
+            $(@node).click =>
+                args = (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
+                context.get(@funcName, false).apply(this, args)
             this
 
 
@@ -254,7 +262,6 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             $(@parentElement).empty()
             @templates = []
 
-
             for element in iterable
                 ctx = context.new()
                 ctx[@elementName] = element
@@ -276,6 +283,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             this
 
         applyContext: (context)->
+            console.log @iterableName
             context.watch @iterableName, (iterable)=>
                 @renderIterable context, iterable
             @renderIterable context, context.get @iterableName
