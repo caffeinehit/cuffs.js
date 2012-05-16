@@ -132,7 +132,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         applyContext: (context)->
             $(@node).click =>
                 args = (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
-                context.get(@funcName, false).apply(this, args)
+                context.get(@funcName, false)(args...)
             this
 
 
@@ -256,11 +256,11 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
 
         renderIterable: (context, iterable)->
             iterable = iterable or []
-            @nodes = []
-            @contexts.shift().destroy() while @contexts.length > 0
 
-            $(@parentElement).empty()
+            $(@nodes).remove()
+            @nodes = []
             @templates = []
+            @contexts.shift().destroy() while @contexts.length > 0
 
             for element in iterable
                 ctx = context.new()
@@ -283,7 +283,6 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             this
 
         applyContext: (context)->
-            console.log @iterableName
             context.watch @iterableName, (iterable)=>
                 @renderIterable context, iterable
             @renderIterable context, context.get @iterableName

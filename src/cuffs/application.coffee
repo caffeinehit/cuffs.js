@@ -31,7 +31,6 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template'], (compiler, context
             @initTemplate()
 
         initControllers: ()->
-
             walk @node, (node, depth)=>
                 if not classpath = node.getAttribute 'data-controller'
                     return
