@@ -135,6 +135,25 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
                 context.get(@funcName, false)(args...)
             this
 
+    class DataHover extends Binding
+        # Call a method on the context when we hover over an
+        # element, eg:
+        # <a data-hover="highlight:todo" href="#">Click Me</a>
+        # If the mouse enters, the first argument will be `true`,
+        # if the mouse leaves, the first argument will be `false`.
+        @bind 'data-hover'
+        constructor: (node)->
+            super node
+            [@funcName, @funcArgs] = @attr.split(':')
+            @funcArgs or= ''
+
+        applyContext: (context)->
+            getArgs = =>
+                (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
+            $(@node).mouseenter =>
+                context.get(@funcName, false)(true, getArgs()...)
+            $(@node).mouseleave =>
+                context.get(@funcName, false)(false, getArgs()...)
 
     class DataSet extends Binding
         # Sets a certain value on the model. Sometimes useful. Eg:
