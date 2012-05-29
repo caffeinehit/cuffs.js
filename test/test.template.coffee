@@ -107,6 +107,22 @@ define ['cuffs/compiler', 'cuffs/template', 'cuffs/context', 'cuffs/bindings'], 
                         $node.change()
                         expect(context.bind).to.be false
 
+                describe 'textarea', ->
+                    context = new Context { bind: null }
+                    [$node, node] = get '#data-bind-textarea'
+
+                    binding = new bindings.DataBind(node).applyContext(context)
+
+                    it 'should bind context changes', ->
+                        context.set 'bind', 'Changed in context'
+                        expect($node.val()).to.be 'Changed in context'
+
+                    it 'should change the context', ->
+                        $node.val 'Changed in template'
+                        $node.change()
+                        expect(context.bind).to.be 'Changed in template'
+
+
             describe 'data-click', ->
                 context = new Context
                 [$node, node] = get '#data-click'
@@ -115,7 +131,7 @@ define ['cuffs/compiler', 'cuffs/template', 'cuffs/context', 'cuffs/bindings'], 
 
                 it 'should call a function when clicked',->
                     num = 0
-                    context.set 'handler', -> -> ++num
+                    context.handler = -> num += 1
                     $node.click()
                     expect(num).to.be 1
 

@@ -75,6 +75,16 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             context.watch @predicate, (value)=> @setValue value
             @setValue context.get @predicate
 
+    class DataSubmit extends Binding
+        # Calls a function on the context when a form is submitted,
+        # eg:
+        #
+        # <form data-submit="onSubmit"></form>
+        @bind 'data-submit'
+
+        applyContext: (context)->
+            $(@node).submit =>
+                context.get(@attr, false)(@node)
 
     class DataBind extends Binding
         # Create two way binding of data between elements and the
@@ -92,7 +102,9 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             super @node
 
         setValue: (value)->
-            if not @type or @type == ""?
+            if @node.tagName == "TEXTAREA"
+                $(@node).val(value)
+            else if not @type or @type == ""?
                 if value?
                     @node.innerHTML = value
             else if @type == 'text'
@@ -102,8 +114,10 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             this
 
         getValue: ()->
-            if not @type or @type == ""?
-                @node.html()
+            if @node.tagName == "TEXTAREA"
+                $(@node).val()
+            else if not @type or @type == ""?
+                $(@node).html()
             else if @type == 'text'
                 @node.value
             else if @type == 'checkbox'
@@ -252,9 +266,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             tpl.applyContext context
             return clone
 
-
     class DataLoop extends Binding
-
         @bind 'data-loop'
         # Stop recursive descent on this node
         stop: true
