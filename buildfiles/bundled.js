@@ -1,9 +1,9 @@
 // Build Cuffs bundled up with require.js
 ({
-  baseUrl: "./lib",
+  baseUrl: "../lib",
   modules: [
     {name: 'cuffs/main',
     include: ['requirejs/require.min']}    
   ],
-  out: "cuffs.min.js"
+  out: "../cuffs.min.js"
 })
