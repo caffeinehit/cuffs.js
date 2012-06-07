@@ -14,8 +14,8 @@ etags = (obj)->
 task 'watch', 'Watch and compile', ->
     coffee = spawn 'coffee', ['-w', '-o', 'lib/', '-c', 'src/']
     coffee.stdout.on 'data', ->
-        console.log 'Building build-normal.js'
-        spawn 'r.js', ['-o', 'build-normal.js']
+        console.log 'Building normal.js'
+        spawn 'r.js', ['-o', 'buildfiles/normal.js']
     out coffee
 
 task 'develop', 'Run a dev server', ->
@@ -28,17 +28,17 @@ task 'develop', 'Run a dev server', ->
 
     coffee.stdout.on 'data', ->
         spawn 'etags', ['src/']
-        spawn 'r.js', ['-o', 'build-normal.js']
+        spawn 'r.js', ['-o', 'buildfiles/normal.js']
 
     spawn 'google-chrome', ['http://localhost:8888/test/test.html']
 
 task 'compile', 'Compile coffee files', ->
     spawn 'coffee', ['-o', 'lib/', '-c', 'src/']
 
-task 'build', 'Create a minified files for distribution', ->
-    one = spawn 'r.js', ['-o', 'build-bundled.js']
-    two = spawn 'r.js', ['-o', 'build-standalone.js']
-    three = spawn 'r.js', ['-o', 'build-normal.js']
+task 'build', 'Create files for distribution', ->
+    one = spawn 'r.js', ['-o', 'buildfiles/bundled.js']
+    two = spawn 'r.js', ['-o', 'buildfiles/standalone.js']
+    three = spawn 'r.js', ['-o', 'buildfiles/normal.js']
     out one
     out two
     out three
