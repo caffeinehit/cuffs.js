@@ -6,6 +6,10 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         # <div data-show="todo.done"></div>
         # <div data-show="todo.done==0"></div>
         # <div data-show="todo.done!=0"></div>
+        # 
+        # NOTE: doesn't handle type coercion so this won't work as expected:
+        #   <div data-show="showOtherSection!=true"
+        # This is because "true" will be a string rather than a bool
 
         @bind 'data-show'
 
