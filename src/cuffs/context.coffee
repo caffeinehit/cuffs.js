@@ -104,12 +104,16 @@ define ['cuffs/utils'], (utils) ->
         set: (name, value)->
             # Set the object referenced by `name` on the context. Allow
             # for dotted notation.
+            #
             # Examples:
             # `name` = 'todo' => @['todo'] = value
             # `name` = 'todo.task' => @['todo']['task'] = value
             # `name` = 'todo.task.priority' => @['todo']['task']['priority'] = value
             #
             # If the nested object does not exist yet, it's created on the fly.
+            #
+            # If `value` is not a function, all observers will be notified.
+
             parts = (part.trim() for part in name.split '.')
 
             if parts.length == 1
@@ -120,6 +124,10 @@ define ['cuffs/utils'], (utils) ->
                     current = current[part] or current[part] = {}
                 current[parts[parts.length-1]] = value
 
+            # Don't notify observers. Apply calls `get()` which would run
+            # the function without possibly expected arguments.
+            if utils.typeOf(value) == "function"
+                return
 
             if @hasProp parts[0]
                 return @apply name
