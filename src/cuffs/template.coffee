@@ -73,9 +73,20 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
             stop = false
             bindings = []
             for Klass in Binding.getBindings node
+                # We don't want to initialize further bindings if the
+                # previous one ordered us to stop. Consider this:
+                #
+                # <li data-loop="a in b" data-show="a.visible"></li>
+                #
+                # `data-show` should initialize inside `data-loop`s
+                # context because `a` is undefined in the current
+                # context.
+                break if stop
+
                 b = new Klass node
                 stop = true if b.stop
                 bindings.push b
+
             return stop: stop, bindings: bindings
 
         # Don't stop recursive descent on this node
