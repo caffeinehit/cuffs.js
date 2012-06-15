@@ -6,10 +6,10 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         # <div data-show="todo.done"></div>
         # <div data-show="todo.done==0"></div>
         # <div data-show="todo.done!=0"></div>
-        # 
-        # NOTE: doesn't handle type coercion so this won't work as expected:
-        #   <div data-show="showOtherSection!=true"
-        # This is because "true" will be a string rather than a bool
+        #
+        # Handles simple type coercion such as `true` and `false`:
+        #
+        # <div data-show="todo.done==true"></div>
 
         @bind 'data-show'
 
@@ -18,14 +18,21 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             notEqual = /.*!=.*/
             equal = /.*==.*/
 
+            booleanWrapper = (attrValue)=>
+                if attrValue == "false"
+                    return false
+                if attrValue == "true"
+                    return true
+                return attrValue
+
             if notEqual.test @attr
                 [@attrName, @attrValue] = @attr.split("!=")
                 @test = (value)=>
-                    return @attrValue != value
+                    return booleanWrapper(@attrValue) != value
             else if equal.test @attr
                 [@attrName, @attrValue] = @attr.split("==")
                 @test = (value)=>
-                    return @attrValue == value
+                    return booleanWrapper(@attrValue) == value
             else
                 @attrName = @attr
                 @test = (value)->
