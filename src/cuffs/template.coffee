@@ -3,6 +3,7 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
 
     DOM_REGEX = /[^>]+>/
     BINDING_REGEX = /\s(data\-[\w\d\-]+)/gim
+    SUBSTITUTION_REGEX = /#\{(.*?)\}/g
     BINDINGS = []
 
     class Template
@@ -102,6 +103,20 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
         # Convenience function
         new Template(node).compile().applyContext(new Context object)
 
+    substitute = (str, context)->
+        retstr = str
+
+        match = ->
+            SUBSTITUTION_REGEX.exec str
+
+        while ref = match()
+            [sub, variable] = ref
+            retstr = retstr.replace(sub, context.get(variable))
+
+        retstr
+
+
     render: render
+    substitute: substitute
     Template: Template
     Binding: Binding
