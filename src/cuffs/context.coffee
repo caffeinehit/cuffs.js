@@ -101,7 +101,7 @@ define ['cuffs/utils'], (utils) ->
         hasProp: (name)->
             {}.hasOwnProperty.call this, name
 
-        set: (name, value)->
+        set: (name, value, doApply = true)->
             # Set the object referenced by `name` on the context. Allow
             # for dotted notation.
             #
@@ -127,6 +127,10 @@ define ['cuffs/utils'], (utils) ->
             # Don't notify observers. Apply calls `get()` which would run
             # the function without possibly expected arguments.
             if utils.typeOf(value) == "function"
+                return
+
+            # Don't notify observers if we've received a `doApply==false`
+            if not doApply
                 return
 
             if @hasProp parts[0]
