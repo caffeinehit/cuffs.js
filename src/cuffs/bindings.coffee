@@ -157,7 +157,10 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         applyContext: (context)->
             $(@node).click =>
                 args = (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
-                context.get(@funcName, false)(args...)
+                try
+                    context.get(@funcName, false)(args...)
+                catch err
+                    throw new TypeError "Can not call method 'apply' of #{@funcName}"
             this
 
     class DataHover extends Binding

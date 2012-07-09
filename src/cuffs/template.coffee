@@ -115,8 +115,15 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
 
         retstr
 
+    optionize = (str, separator = ',')->
+        obj = {}
+        for pair in str.split(separator)
+            [key, val] = pair.split('=')
+            obj[key] = val
+        obj
 
     render: render
     substitute: substitute
+    optionize: optionize
     Template: Template
     Binding: Binding
