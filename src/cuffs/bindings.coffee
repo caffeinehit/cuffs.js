@@ -195,24 +195,31 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
     class DataActivate extends Binding
         # Gives an element an `active` class depending on if the
         # context property matches the attribute, eg:
-        # <ul><li data-activate="active==one"/></ul>
+        # <ul><li data-activate="active==one,active==two"/></ul>
 
         @bind 'data-activate'
         constructor: (node)->
             super node
-            [@watchName, @watchValue] = @attr.split '=='
+            @values = (att.split('==') for att in @attr.split(','))
+
 
         activate: (value)->
-            if value == @watchValue
+            if value in (v[1] for v in @values)
                 $(@node).addClass 'active'
             else
                 $(@node).removeClass 'active'
 
         applyContext: (context)->
-            context.watch @watchName, (value)=> @activate value
-            $(@node).click ()=>
-                context.set @watchName, @watchValue
-            @activate context.get @watchName
+            for v in @values
+                context.watch v[0], (value)=> @activate value
+
+            console.log @node, @attr, @values
+
+            $(@node).bind 'click', =>
+                debugger
+                context.set @values[0][0], @values[0][1]
+
+            @activate context.get @values[0][0]
 
     class DataStyle extends Binding
         # Adds inline styling to a node, eg:
@@ -270,7 +277,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             $(node).remove()
 
         applyContext: (context)->
-            context.set @templateName, this
+            context.root().set @templateName, this
 
         render: (context)->
             clone = @template.cloneNode true
