@@ -202,7 +202,6 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             super node
             @values = (att.split('==') for att in @attr.split(','))
 
-
         activate: (value)->
             if value in (v[1] for v in @values)
                 $(@node).addClass 'active'
@@ -213,10 +212,7 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
             for v in @values
                 context.watch v[0], (value)=> @activate value
 
-            console.log @node, @attr, @values
-
             $(@node).bind 'click', =>
-                debugger
                 context.set @values[0][0], @values[0][1]
 
             @activate context.get @values[0][0]
