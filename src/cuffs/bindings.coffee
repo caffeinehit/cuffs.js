@@ -1,4 +1,4 @@
-define ['./template', './utils'], ({Binding, Template}, utils)->
+define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
 
     class DataShow extends Binding
         # Make element visible depending if the context's attribute
@@ -56,12 +56,14 @@ define ['./template', './utils'], ({Binding, Template}, utils)->
         @bind 'data-attr'
         constructor: (node)->
             super node
-            [@attrName, @contextName] = @attr.split '='
-        setAttr: (value)->
-            $(@node).attr @attrName, value
+            @values = optionize @attr
+        setAttr: (name, value)=>
+            $(@node).attr name, value
         applyContext: (context)->
-            context.watch @contextName, (val)=> @setAttr val
-            @setAttr context.get @contextName
+            for own key, val of @values
+                context.watch val, (v)=> @setAttr key, v
+            for own key, val of @values
+                @setAttr key, context.get val
 
 
     class DataOr extends Binding
