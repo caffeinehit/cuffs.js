@@ -45,8 +45,10 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
                 @node.style.display = "none"
 
         applyContext: (context)->
-            context.watch @attrName, (value)=> @toggle value
-            @toggle context.get @attrName
+            context.watch @attrName, (value)=>
+                @toggle value
+            value = context.get @attrName
+            @toggle value
             this
 
 
@@ -96,8 +98,13 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
         @bind 'data-submit'
 
         applyContext: (context)->
+            [fnName, args] = @attr.split(':')
+            argNames = args?.split(',') or []
+
             $(@node).submit =>
-                context.get(@attr, false)(@node)
+                fn = context.get fnName, false
+                fn.apply @node, (context.get(argName) for argName in argNames)
+                #context.get(@attr, false)(@node)
 
     class DataBind extends Binding
         # Create two way binding of data between elements and the
@@ -159,8 +166,9 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
         applyContext: (context)->
             $(@node).click =>
                 args = (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
+                fn = context.get @funcName, false
                 try
-                    context.get(@funcName, false)(args...)
+                    fn.apply @node, args
                 catch err
                     throw new TypeError "Can not call method 'apply' of #{@funcName}"
             this
