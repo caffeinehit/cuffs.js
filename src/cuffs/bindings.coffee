@@ -127,7 +127,7 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
             else if not @type or @type == ""?
                 if value?
                     @node.innerHTML = value
-            else if @type == 'text'
+            else if @type == 'text' or @type == "hidden"
                 @node.value = value
             else if @type == 'checkbox'
                 $(@node).attr 'checked', value
@@ -138,7 +138,7 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
                 $(@node).val()
             else if not @type or @type == ""?
                 $(@node).html()
-            else if @type == 'text'
+            else if @type == 'text' or @type == "hidden"
                 @node.value
             else if @type == 'checkbox'
                 $(@node).is ':checked'
@@ -147,7 +147,11 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
 
         applyContext: (context)->
             context.watch @attr, (value)=> @setValue value
-            $(@node).change ()=> context.set @attr, @getValue()
+            $(@node).change ()=>
+                try
+                    context.get(@attr, false)(@getValue())
+                catch err
+                    context.set @attr, @getValue()
             @setValue context.get @attr
             this
 

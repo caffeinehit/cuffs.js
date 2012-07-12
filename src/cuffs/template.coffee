@@ -117,7 +117,10 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
 
     optionize = (str, separator = ',')->
         obj = {}
-        for pair in str.split(separator)
+        pairs = str.split separator
+
+        for pair in pairs
+            continue if not pair
             [key, val] = pair.split('=')
             obj[key] = val
         obj
