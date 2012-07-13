@@ -193,9 +193,9 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
             getArgs = =>
                 (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
             $(@node).mouseenter =>
-                context.get(@funcName, false)(true, getArgs()...)
+                context.get(@funcName, false).apply @node, [true].concat getArgs()
             $(@node).mouseleave =>
-                context.get(@funcName, false)(false, getArgs()...)
+                context.get(@funcName, false).apply @node, [false].concat getArgs()
 
     class DataSet extends Binding
         # Sets a certain value on the model. Sometimes useful. Eg:
