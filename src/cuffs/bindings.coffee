@@ -101,10 +101,10 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
             [fnName, args] = @attr.split(':')
             argNames = args?.split(',') or []
 
-            $(@node).submit =>
+            $(@node).bind 'submit', (e)=>
                 fn = context.get fnName, false
-                fn.apply @node, (context.get(argName) for argName in argNames)
-                #context.get(@attr, false)(@node)
+                fn.apply @node, [e].concat (context.get(argName) for argName in argNames)
+
 
     class DataBind extends Binding
         # Create two way binding of data between elements and the
@@ -192,10 +192,11 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
         applyContext: (context)->
             getArgs = =>
                 (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
-            $(@node).mouseenter =>
-                context.get(@funcName, false).apply @node, [true].concat getArgs()
-            $(@node).mouseleave =>
-                context.get(@funcName, false).apply @node, [false].concat getArgs()
+            fn = context.get @funcName, false
+            $(@node).bind 'mouseenter', (e)=>
+                fn.apply this, [e, true].concat getArgs()
+            $(@node).bind 'mouseleave', (e)=>
+                fn.apply this, [e, false].concat getArgs()
 
     class DataSet extends Binding
         # Sets a certain value on the model. Sometimes useful. Eg:
