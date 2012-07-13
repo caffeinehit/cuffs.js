@@ -168,8 +168,8 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
             @funcArgs or= ''
 
         applyContext: (context)->
-            $(@node).click =>
-                args = (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
+            $(@node).bind 'click', (e)=>
+                args = [e].concat (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
                 fn = context.get @funcName, false
                 try
                     fn.apply @node, args
