@@ -117,6 +117,7 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
 
         @bind 'data-bind'
 
+        textTypes: ['text','hidden', 'email']
         constructor: (@node)->
             @type = @node.type
             super @node
@@ -127,8 +128,10 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
             else if not @type or @type == ""?
                 if value?
                     @node.innerHTML = value
-            else if @type == 'text' or @type == "hidden"
+            else if @type in @textTypes
                 @node.value = value
+            else if @type == 'password'
+                @node.value = value or ''
             else if @type == 'checkbox'
                 $(@node).attr 'checked', value
             this
@@ -138,7 +141,9 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
                 $(@node).val()
             else if not @type or @type == ""?
                 $(@node).html()
-            else if @type == 'text' or @type == "hidden"
+            else if @type in @textTypes
+                @node.value
+            else if @type == 'password'
                 @node.value
             else if @type == 'checkbox'
                 $(@node).is ':checked'
