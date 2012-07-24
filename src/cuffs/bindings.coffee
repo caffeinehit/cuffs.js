@@ -151,13 +151,16 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
                 throw new Error "Unknown type to bind to: #{@type}"
 
         applyContext: (context)->
-            context.watch @attr, (value)=> @setValue value
-            $(@node).change ()=>
+            context.watch @attr, (value)=>
+                @setValue value if value?
+
+            $(@node).change ()=>                
                 try
                     context.get(@attr, false)(@getValue())
                 catch err
                     context.set @attr, @getValue()
-            @setValue context.get @attr
+            val = context.get @attr
+            @setValue val if val?
             this
 
 
