@@ -47,18 +47,43 @@ define ['cuffs/utils'], (utils) ->
             this
 
         apply: (attr)->
-            # Call all observers and propagate down to children. If `attr`
-            # is specified only call observers of `attr`.
+            # Call all observers and propagate down to children. If
+            # `attr` is specified only call observers of `attr` and
+            # its child observers, eg: @apply('foo') where 'foo' is
+            # {'bar': {'baz': 1}} would call all observers that
+            # observe all child values of 'foo'
             if not attr?
-                for attr, observers of this.__observers__
+                for own attr, observers of this.__observers__
                     value = @get attr
                     observer value for observer in observers
                 for child in this.__children__
                     child.apply()
             else
                 value = @get attr
-                observer value for observer in this.__observers__[attr] or []
+
+                for name, observers of this.__observers__
+                    if name == attr
+                        observer value for observer in observers
+                    else if name.indexOf(attr) == 0
+                        @apply name 
+
                 child.apply attr for child in this.__children__
+
+                # if attr.indexOf('.') > 0
+
+                # value = @get attr
+                # for own name, observers of this.__observers__
+                #     if name.indexOf(attr) == 0
+                #         observer value for observer in observers 
+
+                # # for own key, observers of this.__observers__
+                # #     if key.indexOf(attr) == 0
+                # #         observer value 
+
+                # child.apply attr for child in this.__children__
+
+                #observer value for observer in this.__observers__[attr] or []
+                #child.apply attr for child in this.__children__
             this
 
         parent: ()->
@@ -133,8 +158,14 @@ define ['cuffs/utils'], (utils) ->
             if not doApply
                 return
 
+        
+            # If the object we just set on the context is nativ to the
+            # current context, call all observers.
             if @hasProp parts[0]
                 return @apply name
+
+            # If not, travel up the chain of contexts until we find
+            # where the object is native and call apply there
             ctx = this
             while ctx = ctx.parent()
                 continue if not ctx.hasProp parts[0]

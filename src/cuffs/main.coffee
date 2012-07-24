@@ -1,4 +1,20 @@
-define ['cuffs/compiler', 'cuffs/context', 'cuffs/template', 'cuffs/bindings', 'cuffs/controller', 'cuffs/application', 'cuffs/utils'], (compiler, context, template, bindings, controller, application, utils) ->
+define [
+    'cuffs/compiler',
+    'cuffs/context',
+    'cuffs/template',
+    'cuffs/bindings',
+    'cuffs/controller',
+    'cuffs/application',
+    'cuffs/utils',
+    ], (
+    compiler,
+    context,
+    template,
+    bindings,
+    controller,
+    application,
+    utils,
+    )->
 
     {Context} = context
     {Template, Binding} = template
@@ -13,5 +29,6 @@ define ['cuffs/compiler', 'cuffs/context', 'cuffs/template', 'cuffs/bindings', '
         utils: utils
         bindings: bindings
         controller: controller
+        template: template
         apps: []
     }
