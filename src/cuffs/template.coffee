@@ -103,17 +103,22 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
         # Convenience function
         new Template(node).compile().applyContext(new Context object)
 
-    substitute = (str, context)->
+    substitute = (str, context, getVars = false)->
         retstr = str
+        vars = []
 
         match = ->
             SUBSTITUTION_REGEX.exec str
 
         while ref = match()
             [sub, variable] = ref
-            retstr = retstr.replace(sub, context.get(variable))
+            vars.push variable
+            value = context.get(variable)
+            retstr = retstr.replace(sub, value)
 
-        retstr
+        if getVars
+            return [retstr, vars]
+        return retstr
 
     optionize = (str, separator = ',')->
         obj = {}
