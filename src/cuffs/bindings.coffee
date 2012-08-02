@@ -1,4 +1,4 @@
-define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
+define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}, utils)->
 
     class DataShow extends Binding
         # Make element visible depending if the context's attribute
@@ -358,9 +358,7 @@ define ['./template', './utils'], ({Binding, Template, optionize}, utils)->
             this
 
 
-
-
-    return {
+    return Cuffs.Template.DefaultBindings = {
         DataShow: DataShow
         DataBind: DataBind
         DataClick: DataClick

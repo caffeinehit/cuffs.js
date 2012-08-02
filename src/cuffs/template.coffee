@@ -1,5 +1,4 @@
-define ['./compiler', './context', './utils'], (compiler, context, utils) ->
-    {Context} = context
+define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context, utils) ->
 
     DOM_REGEX = /[^>]+>/
     BINDING_REGEX = /\s(data\-[\w\d\-]+)/gim
@@ -130,8 +129,10 @@ define ['./compiler', './context', './utils'], (compiler, context, utils) ->
             obj[key] = val
         obj
 
-    render: render
-    substitute: substitute
-    optionize: optionize
-    Template: Template
-    Binding: Binding
+    return Cuffs.Template = {
+        render: render
+        substitute: substitute
+        optionize: optionize
+        Template: Template
+        Binding: Binding
+    }

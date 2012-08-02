@@ -1,11 +1,12 @@
 # Utility functions
 
-define ->
-    return class Utils
-        @extend: (target, source)->
+define ['./ns'], (Cuffs )->
+    
+    return Cuffs.Utils = {
+        extend: (target, source)->
             target[key] = value for own key, value of source
 
-        @serialize: (object)->
+        serialize: (object)->
             if object and object.serialize?
                 return object.serialize()
 
@@ -14,10 +15,10 @@ define ->
 
             object
 
-        @map: (iter, fn)->
+        map: (iter, fn)->
             fn elem for elem in iter
 
-        @typeOf: (()->
+        typeOf: (()->
             classToType = {}
             types = "Boolean Number String Function Array Date RegExp Undefined Null".split " "
 
@@ -26,3 +27,4 @@ define ->
 
             (object)->
                 classToType[Object::toString.call(object)] or "object")()
+    }                

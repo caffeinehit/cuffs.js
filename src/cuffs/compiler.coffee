@@ -1,5 +1,5 @@
-define ->
-    STOP_DESCENT = 'stop-descent-+"*' # Random string, easier == / != comparison
+define ['./ns'], (Cuffs) ->
+    STOP_DESCENT = 'stop-descent-+"*' # Random string, easier equality comparison
 
     walk = (tree, callback)->
         # Walk a DOM tree depth first and call a callback on
@@ -16,5 +16,7 @@ define ->
             return recurse current.nextElementSibling, depth
         return recurse tree.firstElementChild if tree.firstElementChild?
 
-    STOP_DESCENT: STOP_DESCENT
-    walk: walk
+    return Cuffs.Compiler = {
+        STOP_DESCENT: STOP_DESCENT
+        walk: walk
+    }

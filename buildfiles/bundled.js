@@ -2,7 +2,7 @@
 ({
   baseUrl: "../lib",
   modules: [
-    {name: 'cuffs/main',
+    {name: 'cuffs/cuffs',
     include: ['requirejs/require.min']}    
   ],
   out: "../cuffs.min.js"

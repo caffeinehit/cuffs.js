@@ -2,7 +2,7 @@
 ({
   baseUrl: "../lib",
   modules: [
-    {name: 'cuffs/main'}    
+    {name: 'cuffs/cuffs'}    
   ],
   out: "../cuffs.standalone.min.js"
 })

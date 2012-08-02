@@ -1,4 +1,14 @@
-define ['cuffs/compiler', 'cuffs/template', 'cuffs/context', 'cuffs/bindings'], (compiler,{Template, Binding, render},{Context},bindings)->
+define [
+    'cuffs/compiler',
+    'cuffs/template',
+    'cuffs/context',
+    'cuffs/bindings'
+    ], (
+    compiler,
+    {Template, Binding, render},
+    Context,
+    bindings,
+    )->
 
     get = (name)->
         [$(name), $(name)[0]]

@@ -1,4 +1,4 @@
-define ['cuffs/utils'], (utils) ->
+define ['./ns', './utils'], (Cuffs, utils) ->
 
     class Context
         constructor: (obj)->
@@ -171,7 +171,4 @@ define ['cuffs/utils'], (utils) ->
                 continue if not ctx.hasProp parts[0]
                 return ctx.apply name
 
-
-    return {
-        Context: Context
-    }
+    return Cuffs.Context = Context
