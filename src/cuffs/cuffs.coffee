@@ -1,5 +1,6 @@
 define [
     './ns',
+    './application',
     './compiler',
     './context',
     './template',
