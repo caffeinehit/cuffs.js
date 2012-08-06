@@ -97,7 +97,7 @@ define (require)->
         @start: (callback)->
             # Start all applications. If a callback is provided, call
             # it after everything is done.
-            Cuffs.apps = $('[data-app']).map ->
+            Cuffs.apps = $('[data-app]').map ->
                 new Application this, callback
 
     return Cuffs.Application =  Application
