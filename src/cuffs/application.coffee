@@ -1,4 +1,8 @@
-define ['./ns','./compiler', './context', './template'], (Cuffs, {walk}, Context, {Template})->
+define (require)->
+    Cuffs      = require './ns'
+    {walk}     = require './compiler'
+    Context    = require './context'
+    {Template} = require './template'
 
 
     # Looks up objects on the global classpath, eg:
