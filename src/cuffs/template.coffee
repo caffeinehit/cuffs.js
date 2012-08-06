@@ -103,6 +103,8 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         new Template(node).compile().applyContext(new Context object)
 
     substitute = (str, context, getVars = false)->
+        # Do substitution of values from a context in a string, eg
+        # "foo: #{bar}" replaces `#{bar}` with `context.get('bar')`
         retstr = str
         vars = []
 
