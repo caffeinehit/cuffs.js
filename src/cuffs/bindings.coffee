@@ -23,16 +23,21 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
                     return false
                 if attrValue == "true"
                     return true
+                
                 return attrValue
 
             if notEqual.test @attr
                 [@attrName, @attrValue] = @attr.split("!=")
                 @test = (value)=>
-                    return booleanWrapper(@attrValue) != value
+                    # We don't want strict comparison - coercion is
+                    # fine - hence the backticks.
+                    return `booleanWrapper(this.attrValue) != value`
             else if equal.test @attr
                 [@attrName, @attrValue] = @attr.split("==")
                 @test = (value)=>
-                    return booleanWrapper(@attrValue) == value
+                    # We don't want strict comparison - coercion is
+                    # fine - hence the backticks.
+                    return `booleanWrapper(this.attrValue) == value`
             else
                 @attrName = @attr
                 @test = (value)->
