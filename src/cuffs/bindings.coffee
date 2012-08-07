@@ -17,6 +17,8 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
             super node
             notEqual = /.*!=.*/
             equal = /.*==.*/
+            lesser  = /.*<.*/
+            greater = /.*>.*/
 
             booleanWrapper = (attrValue)=>
                 if attrValue == "false"
@@ -38,6 +40,14 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
                     # We don't want strict comparison - coercion is
                     # fine - hence the backticks.
                     return `booleanWrapper(this.attrValue) == value`
+            else if lesser.test @attr
+                [@attrName, @attrValue] = @attr.split("<")
+                @test = (value)=>
+                    return `value < booleanWrapper(this.attrValue)`
+            else if greater.test @attr
+                [@attrName, @attrValue] = @attr.split(">")
+                @test = (value)=>
+                    return `value > booleanWrapper(this.attrValue)`
             else
                 @attrName = @attr
                 @test = (value)->
