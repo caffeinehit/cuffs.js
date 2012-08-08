@@ -194,6 +194,8 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
             $(@node).bind 'click', (e)=>
                 args = [e].concat (context.get(arg) for arg in @funcArgs.split ',' when arg.trim())
                 fn = context.get @funcName, false
+                if not fn?
+                    throw new Error "Couldn't find click handler '#{@funcName}' in context"
                 fn.apply @node, args
 
             this
