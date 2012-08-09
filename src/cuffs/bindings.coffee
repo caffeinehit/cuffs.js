@@ -283,6 +283,9 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
 
         applyContext: (context)->
             for own name, {raw, objects} of @styles
+                if not objects?
+                    @setValue name, raw
+                    continue
                 for object in objects
                     object = object.replace(@regexp, '$1')
                     context.watch object, (value)=>
