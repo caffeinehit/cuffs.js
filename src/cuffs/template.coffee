@@ -102,24 +102,24 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         # Convenience function
         new Template(node).compile().applyContext(new Context object)
 
-    substitute = (str, context, getVars = false)->
+    getVars = (str)->
+        results = []
+        while ref = SUBSTITUTION_REGEX.exec(str)
+            [raw, name] = ref
+            results.push raw: raw, name: name
+        results 
+
+    substitute = (str, context)->
         # Do substitution of values from a context in a string, eg
         # "foo: #{bar}" replaces `#{bar}` with `context.get('bar')`
-        retstr = str
-        vars = []
 
-        match = ->
-            SUBSTITUTION_REGEX.exec str
+        vars = getVars str
 
-        while ref = match()
-            [sub, variable] = ref
-            vars.push variable
-            value = context.get(variable)
-            retstr = retstr.replace(sub, value)
+        for {raw, name} in vars
+            str = str.replace(raw, context.get(name))
 
-        if getVars
-            return [retstr, vars]
-        return retstr
+        str 
+
 
     optionize = (str, separator = ',')->
         obj = {}
@@ -132,9 +132,10 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         obj
 
     return Cuffs.Template = {
-        render: render
-        substitute: substitute
-        optionize: optionize
-        Template: Template
-        Binding: Binding
+        getVars    : getVars
+        optionize  : optionize
+        substitute : substitute
+        render     : render
+        Binding    : Binding
+        Template   : Template
     }
