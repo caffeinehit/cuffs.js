@@ -14,6 +14,26 @@ define [
         [$(name), $(name)[0]]
 
     describe 'Template', ->
+        describe 'template', ->
+            [$node, node] = get '#template'
+            tpl = new Template node
+            ctx = new Context title: "Something new"
+
+
+            it 'should return a template object', ->
+                expect(tpl).not.to.be null
+
+            it 'should contain one interpolation candidate', ->
+                expect(tpl.interpolations.length).to.be 1
+
+            it 'should interpolate interpolation candidates', ->
+                tpl.applyContext ctx
+                expect($node.find('a').attr('title')).to.be "Something new"
+
+                ctx.set 'title', "Something old"
+                expect($node.find('a').attr('title')).to.be "Something old"
+                
+
         describe 'context', ->
             context = new Context {
                 foo: 'bar'
@@ -253,7 +273,7 @@ define [
             dom_template_musicians = document.getElementById 'dom_template_musicians'
 
             it 'should render a node with context', ->
-                tpl = new Template(dom_template).compile().applyContext context
+                tpl = new Template(dom_template).applyContext context
                 expect(dom_template_name.innerHTML).to.be 'Rendered with: <span data-bind="name">Frontend.js</span>'
                 expect(dom_template_musicians.childElementCount).to.be 2
                 expect(dom_template_musicians.firstElementChild.innerHTML.trim()).to.be '

@@ -37,6 +37,9 @@
     <p data-binding1="binding1"></p>
     <p data-binding2="binding2" data-binding3="binding3"></p>
   </div>
+  <div id="template">
+    <a href="#" title="#{title}">A Link</a>
+  </div>
   <div id="data-show" data-show="show">Show, or not</div>
   <div id="data-show-coercion" data-show="show==false">Show, or not</div>
   <div id="data-bind" data-bind="bind"></div>
@@ -50,7 +53,7 @@
     <a href="#" data-activate="active==two">two</a>
   </div>
   <p id="data-style" data-style="background-color: #{background-color}; color: #{color}">Test</p>
-  <div id="data-attr" data-attr="title=title"></div>
+  <div id="data-attr" data-attr="title=#{title}"></div>
   <div id="data-or" data-or="predicate ? true : false"></div>
   <div id="data-template" data-template="data-template"><p data-bind="text"></p></div>
   <div id="dom_template">

@@ -1,4 +1,8 @@
-define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}, utils)->
+define (require)->
+    Cuffs = require './ns'
+    {Binding, Template, optionize, substitute} = require './template'
+    utils = require './utils'
+
 
     class DataShow extends Binding
         # Make element visible depending if the context's attribute
@@ -78,9 +82,10 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
             $(@node).attr name, value
         applyContext: (context)->
             for own key, val of @values
-                context.watch val, (v)=> @setAttr key, v
+                context.watch val, =>
+                    @setAttr key, substitute val, context
             for own key, val of @values
-                @setAttr key, context.get val
+                @setAttr key, substitute val, context 
 
 
     class DataOr extends Binding
@@ -318,7 +323,7 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
 
         render: (context)->
             clone = @template.cloneNode true
-            tpl = new Template(clone).compile()
+            tpl = new Template(clone)
             {bindings} = Binding.init clone
             tpl.push b for b in bindings
             tpl.applyContext context
@@ -344,6 +349,7 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
             @contexts = []
 
         renderIterable: (context, iterable)->
+            console.log "renderIterable"
             iterable = iterable or []
 
             $(@nodes).remove()
@@ -358,7 +364,7 @@ define ['./ns', './template', './utils'], (Cuffs, {Binding, Template, optionize}
 
                 clone = @template.cloneNode true
                 @nodes.push clone
-                tpl = new Template(clone).compile()
+                tpl = new Template(clone)
                 @templates.push tpl
                 # Creating a template instance does not take
                 # into account bindings on the root element

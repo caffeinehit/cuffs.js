@@ -68,9 +68,9 @@ define (require)->
 
         initTemplate: ()->
             # Make the DOM ready to rumble
-            @template = new Template(@node).compile()
-            @template.applyContext (binding)=>
-                @getParentContext binding.node
+            @template = new Template(@node)
+            @template.applyContext (node)=>
+                @getParentContext node
 
         getParentContext: (node)->
             # Return the parent context of a DOM node

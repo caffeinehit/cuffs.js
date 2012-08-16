@@ -6,23 +6,30 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
     BINDINGS = []
 
     class Template
-        # A template holds all bindings that need to be rendered.
+        # A template holds all bindings that need to be rendered. It's
+        # also interpolating all strings in attributes.
+        ipattrs: ['title', 'style']
         constructor: (@node)->
             @bindings = []
             @callbacks = []
-
-        addCallback: (callback)->
-            # Callbacks that are called on each binding
-            # we encounter while compiling the template
-            @callbacks.push callback
+            @interpolations = []
+            @compile()
 
         compile: ()->
+            console.log "compiling template from", @node
             compiler.walk @node, (node, depth)=>
                 {stop, bindings} = Binding.init node
                 for binding in bindings
                     @push binding
-                    for callback in @callbacks
-                        callback node, binding, depth
+                for attr in @ipattrs
+                    continue if not node.attributes[attr]?
+                    vars = getVars node.attributes[attr].value
+                    continue if vars.length == 0
+                    @interpolations.push
+                        attrName: attr
+                        attrValue: node.attributes[attr].value
+                        vars: vars
+                        node: node
                 return compiler.STOP_DESCENT if stop
             this
 
@@ -32,9 +39,13 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
 
         applyContext: (context)->
             if utils.typeOf(context) == "function"
-                binding.applyContext context(binding) for binding in @bindings
+                for binding in @bindings
+                    binding.applyContext context(binding.node)
             else
-                binding.applyContext context for binding in @bindings
+                for binding in @bindings
+                    binding.applyContext context
+                for {attrName, attrValue, vars, node} in @interpolations
+                    node.attributes[attrName].value = substitute attrValue, context 
             this
 
     class Binding
@@ -100,7 +111,7 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
 
     render = (node, object)->
         # Convenience function
-        new Template(node).compile().applyContext(new Context object)
+        new Template(node).applyContext(new Context object)
 
     getVars = (str)->
         results = []
