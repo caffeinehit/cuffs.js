@@ -1,6 +1,6 @@
 define (require)->
     Cuffs = require './ns'
-    {Binding, Template, optionize, substitute} = require './template'
+    {Binding, Template, optionize, substitute, getVars} = require './template'
     utils = require './utils'
 
 
@@ -59,15 +59,14 @@ define (require)->
 
         toggle: (value)->
             if @test value
-                @node.style.display = ""
+                $(@node).show()
             else
-                @node.style.display = "none"
+                $(@node).hide()
 
         applyContext: (context)->
             context.watch @attrName, (value)=>
                 @toggle value
-            value = context.get @attrName
-            @toggle value
+            @toggle context.get @attrName
             this
 
 
@@ -82,9 +81,10 @@ define (require)->
             $(@node).attr name, value
         applyContext: (context)->
             for own key, val of @values
-                @setAttr key, substitute val, context 
-                context.watch val, =>
-                    @setAttr key, substitute val, context
+                @setAttr key, substitute val, context
+                for pair in getVars(val)
+                    context.watch pair.name, => 
+                        @setAttr key, substitute val, context
                     
 
 

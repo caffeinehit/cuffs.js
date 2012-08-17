@@ -36,6 +36,9 @@ define (require)->
         _controller_ctor: {}
 
 
+        # Used for looking up controller by name
+        _controller_names: {}
+
         constructor: (@node, @callback = (->))->
             @context = new Context
             @initControllers()
@@ -60,6 +63,7 @@ define (require)->
                 @_controller_ids[id] = controller
                 @_controller_context_ids[id] = context
                 @_controller_ctor[Controller] = controller
+                @_controller_names[classpath] = controller
 
                 $(node).attr('data-controller-id', id)
 

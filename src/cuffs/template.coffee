@@ -8,7 +8,7 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
     class Template
         # A template holds all bindings that need to be rendered. It's
         # also interpolating all strings in attributes.
-        ipattrs: ['title', 'style']
+        ipattrs: ['title', 'style', 'class', 'alt']
         constructor: (@node)->
             @bindings = []
             @callbacks = []
@@ -41,12 +41,19 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
                 for binding in @bindings
                     binding.applyContext context(binding.node)
                 for {attrName, attrValue, vars, node} in @interpolations
-                    node.attributes[attrName].value = substitute attrValue, context node 
+                    node.attributes[attrName].value = substitute attrValue, context node
+                    for pair in vars
+                        context(node).watch pair.name, ->
+                            node.attributes[attrName].value = substitute attrValue, context(node)
+                            
             else
                 for binding in @bindings
                     binding.applyContext context
                 for {attrName, attrValue, vars, node} in @interpolations
-                    node.attributes[attrName].value = substitute attrValue, context 
+                    node.attributes[attrName].value = substitute attrValue, context
+                    for pair in vars
+                        context.watch pair.name, ->
+                            node.attributes[attrName].value = substitute attrValue, context
             this
 
     class Binding
