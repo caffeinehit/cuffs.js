@@ -147,7 +147,7 @@ define (require)->
                 $(@node).val(value)
             else if not @type or @type == ""?
                 if value?
-                    @node.innerHTML = value
+                    $(@node).text value 
             else if @type in @textTypes
                 @node.value = value
             else if @type == 'password'
