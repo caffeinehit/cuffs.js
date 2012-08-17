@@ -82,10 +82,10 @@ define (require)->
             $(@node).attr name, value
         applyContext: (context)->
             for own key, val of @values
+                @setAttr key, substitute val, context 
                 context.watch val, =>
                     @setAttr key, substitute val, context
-            for own key, val of @values
-                @setAttr key, substitute val, context 
+                    
 
 
     class DataOr extends Binding
@@ -349,7 +349,6 @@ define (require)->
             @contexts = []
 
         renderIterable: (context, iterable)->
-            console.log "renderIterable"
             iterable = iterable or []
 
             $(@nodes).remove()

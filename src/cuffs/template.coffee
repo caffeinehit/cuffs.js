@@ -16,7 +16,6 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             @compile()
 
         compile: ()->
-            console.log "compiling template from", @node
             compiler.walk @node, (node, depth)=>
                 {stop, bindings} = Binding.init node
                 for binding in bindings
@@ -41,6 +40,8 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             if utils.typeOf(context) == "function"
                 for binding in @bindings
                     binding.applyContext context(binding.node)
+                for {attrName, attrValue, vars, node} in @interpolations
+                    node.attributes[attrName].value = substitute attrValue, context node 
             else
                 for binding in @bindings
                     binding.applyContext context
@@ -127,7 +128,11 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         vars = getVars str
 
         for {raw, name} in vars
-            str = str.replace(raw, context.get(name))
+            value = context.get name
+            if value?
+                str = str.replace raw, value
+            else
+                str = str.replace raw, ''
 
         str 
 
