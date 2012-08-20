@@ -9,12 +9,12 @@ define ['./ns'], (Cuffs) ->
         recurse = (current, depth = 1)->
             stopDescent = callback current, depth
 
-            if stopDescent != STOP_DESCENT and current.firstElementChild?
-                recurse current.firstElementChild, depth + 1
+            if stopDescent != STOP_DESCENT and current.firstChild?
+                recurse current.firstChild, depth + 1
 
-            return if not current.nextElementSibling?
-            return recurse current.nextElementSibling, depth
-        return recurse tree.firstElementChild if tree.firstElementChild?
+            return if not current.nextSibling?
+            return recurse current.nextSibling, depth
+        return recurse tree.firstChild if tree.firstChild?
 
     return Cuffs.Compiler = {
         STOP_DESCENT: STOP_DESCENT

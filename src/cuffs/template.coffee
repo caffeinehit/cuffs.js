@@ -13,13 +13,23 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             @bindings = []
             @callbacks = []
             @interpolations = []
+            @text = []
             @compile()
 
         compile: ()->
             compiler.walk @node, (node, depth)=>
+                return if not (node.nodeType in [Node.TEXT_NODE, Node.ELEMENT_NODE])
+
+                if node.nodeType == Node.TEXT_NODE
+                    if pairs = getVars node.textContent
+                        @text.push node: node, text: node.textContent, vars: pairs
+                    return 
+
                 {stop, bindings} = Binding.init node
+
                 for binding in bindings
                     @push binding
+
                 for attr in @ipattrs
                     continue if not node.attributes[attr]?
                     vars = getVars node.attributes[attr].value
@@ -29,6 +39,7 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
                         attrValue: node.attributes[attr].value
                         vars: vars
                         node: node
+                
                 return compiler.STOP_DESCENT if stop
             this
 
@@ -40,6 +51,12 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             if utils.typeOf(context) == "function"
                 for binding in @bindings
                     binding.applyContext context(binding.node)
+                for {node, text, vars} in @text
+                    node.textContent = substitute text, context node
+                    for pair in vars
+                        console.log "watching", pair.name
+                        context(node).watch pair.name, ->
+                            node.textContent = substitute text, context(node)
                 for {attrName, attrValue, vars, node} in @interpolations
                     node.attributes[attrName].value = substitute attrValue, context node
                     for pair in vars
@@ -49,6 +66,13 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             else
                 for binding in @bindings
                     binding.applyContext context
+                for {node, text, vars} in @text
+                    node.textContent = substitute text, context
+                    for pair in vars
+                        console.log "watching 2", pair.name
+                        context.watch pair.name, ->
+                            console.log "watching 2 running on", pair.name
+                            node.textContent = substitute text, context 
                 for {attrName, attrValue, vars, node} in @interpolations
                     node.attributes[attrName].value = substitute attrValue, context
                     for pair in vars

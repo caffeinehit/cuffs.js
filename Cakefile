@@ -34,7 +34,7 @@ task 'develop', 'Run a dev server', ->
         spawn 'etags', ['src/']
         spawn 'r.js', ['-o', 'buildfiles/normal.js']
 
-    spawn 'google-chrome', ['http://localhost:8888/test/test.html']
+    spawn 'chromium-browser', ['http://localhost:8888/test/test.html']
 
 
 task 'compile', 'Compile coffee files', ->

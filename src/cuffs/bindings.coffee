@@ -183,6 +183,20 @@ define (require)->
             @setValue val if val?
             this
 
+    class DataText extends Binding
+        # Interpolate a node's text content on the fly.
+        @bind 'data-text'
+        update: (context)->
+            $(@node).text substitute @text, context
+            
+        applyContext: (context)->
+            @text = $(@node).text()
+            vars = getVars @text
+
+            for pair in vars
+                context.watch pair.name, => @update context
+            @update context
+
 
     class DataClick extends Binding
         # Call a method on the context when the tag is clicked, eg:

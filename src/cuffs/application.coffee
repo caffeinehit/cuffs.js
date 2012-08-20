@@ -52,8 +52,8 @@ define (require)->
             # it after all controllers have been constructed.
 
             walk @node, (node, depth)=>
-                if not classpath = node.getAttribute 'data-controller'
-                    return
+                return if node.nodeType != Node.ELEMENT_NODE
+                return if not classpath = node.getAttribute 'data-controller'
 
                 id = Application.id()
                 context = @getParentContext(node).new()
@@ -74,10 +74,15 @@ define (require)->
             # Make the DOM ready to rumble
             @template = new Template(@node)
             @template.applyContext (node)=>
-                @getParentContext node
+                    @getParentContext node
+
 
         getParentContext: (node)->
             # Return the parent context of a DOM node
+            if not node?
+                return @context
+            if node.nodeType == Node.TEXT_NODE
+                return @getParentContext node.parentElement
             if id = node.getAttribute('data-controller-id')
                 return @_controller_context_ids[id]
             while node = node.parentElement
