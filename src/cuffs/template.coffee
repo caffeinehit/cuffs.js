@@ -8,7 +8,7 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
     class Template
         # A template holds all bindings that need to be rendered. It's
         # also interpolating all strings in attributes.
-        ipattrs: ['title', 'style', 'class', 'alt']
+        ipattrs: ['title', 'style', 'class', 'alt', 'id']
         constructor: (@node)->
             @bindings = []
             @callbacks = []
