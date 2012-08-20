@@ -82,7 +82,7 @@ define [
                 expect(num).to.be 3
 
         describe 'data-show', ->
-            context = new Context { show: false }
+            context = new Context { show: false, number: 0 }
             [$node, node] = get '#data-show'
 
             binding = new bindings.DataShow(node).applyContext(context)
@@ -98,6 +98,17 @@ define [
                 expect($(node).is(':visible')).to.be false
                 context.set 'show', false
                 expect($(node).is(':visible')).to.be true
+            it 'should do basic comparison operations', ->
+                [$node, node] = get '#data-show-comparison'
+                binding = new bindings.DataShow(node).applyContext(context)
+                expect($node.is(':visible')).to.be false
+                context.set 'number', 1
+                expect($node.is(':visible')).to.be false
+                context.set 'number', 2
+                expect($node.is(':visible')).to.be true
+                context.set 'number', 1
+                expect($node.is(':visible')).to.be false
+
 
         describe 'data-bind', ->
             describe 'html element', ->
