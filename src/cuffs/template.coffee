@@ -8,50 +8,62 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
     class Template
         # A template holds all bindings that need to be rendered. It's
         # also interpolating all strings in attributes.
-        ipattrs: ['title', 'style', 'class', 'alt', 'id']
+        elementAttrs: ['title', 'style', 'class', 'alt', 'id']
         constructor: (@node)->
             @bindings = []
             @callbacks = []
-            @interpolations = []
+            @attrs = []
             @text = []
             @compile()
 
+        compileTextNode: (node)->
+            return if not (node.nodeType == Node.TEXT_NODE)
+            vars = getVars node.textContent
+            if vars.length > 0
+                @text.push
+                    node: node
+                    text: node.textContent
+                    vars: vars
+                    
+        compileElementAttrs: (node)->
+            return if not (node.nodeType == Node.ELEMENT_NODE)
+            for attr in @elementAttrs
+                continue if not node.attributes[attr]?
+                vars = getVars node.attributes[attr].value 
+                @attrs.push
+                    attr: attr
+                    value: node.attributes[attr].value
+                    vars: vars
+                    node: node
+
+        compileElementNode: (node)->
+            return if not (node.nodeType == Node.ELEMENT_NODE)
+            {stop, bindings} = Binding.init node
+            @bindings = @bindings.concat bindings
+            return stop 
+            
+
         compile: ()->
             compiler.walk @node, (node, depth)=>
-                return if not (node.nodeType in [Node.TEXT_NODE, Node.ELEMENT_NODE])
-
-                if node.nodeType == Node.TEXT_NODE
-                    if pairs = getVars node.textContent
-                        @text.push node: node, text: node.textContent, vars: pairs
-                    return 
-
-                {stop, bindings} = Binding.init node
-
-                for binding in bindings
-                    @push binding
-
-                for attr in @ipattrs
-                    continue if not node.attributes[attr]?
-                    vars = getVars node.attributes[attr].value
-                    continue if vars.length == 0
-                    @interpolations.push
-                        attrName: attr
-                        attrValue: node.attributes[attr].value
-                        vars: vars
-                        node: node
-                
-                return compiler.STOP_DESCENT if stop
+                @compileTextNode node
+                @compileElementAttrs node
+                return compiler.STOP_DESCENT if @compileElementNode node 
             this
 
         push: (binding)->
             @bindings.push binding
-            this
 
         applyContext: (context)->
+            for binding in @bindings
+                binding.applyContext context
+            return 
             if utils.typeOf(context) == "function"
                 for binding in @bindings
                     binding.applyContext context(binding.node)
+                    
                 for {node, text, vars} in @text
+                    ctx = context node
+                    
                     node.textContent = substitute text, context node
                     for pair in vars
                         console.log "watching", pair.name

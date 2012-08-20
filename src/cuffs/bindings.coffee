@@ -4,6 +4,42 @@ define (require)->
     utils = require './utils'
 
 
+    # Looks up objects on the global classpath, eg:
+    # lookup('window.document.body')
+    lookup = (classpath)->
+        parts = classpath.split '.'
+        current = this
+
+        for part in parts
+            current = current[part]
+
+            if not current?
+                throw new Error "Not found: #{classpath}"
+
+        current
+
+
+    class DataController extends Binding
+        # Initialise the controller associated with the current node
+        @__id__: 0
+        @id: -> ++ DataController.__id__
+        @bind 'data-controller'
+        stop: true # Stop recursive descent
+        constructor: (args...)->
+            super args...
+            @Class = lookup @attr 
+            
+        applyContext: (context)->
+            app = context.get '$app'
+            @instance = new @Class context: context, app: app
+            @instance.init?()
+            app.addController @Class, @instance
+
+            template  = new Template @node
+            template.applyContext context.new()
+            console.log "started controller", @instance
+
+
     class DataShow extends Binding
         # Make element visible depending if the context's attribute
         # is not falsy, eg:
@@ -267,7 +303,9 @@ define (require)->
 
         applyContext: (context)->
             for v in @values
-                context.watch v[0], (value)=> @activate value
+                context.watch v[0], (value)=>
+                    console.log "handling", v[0], 'with', value, '(', context.get(v[0]), ')'
+                    @activate value
 
             $(@node).bind 'click', =>
                 context.set @values[0][0], @values[0][1]
