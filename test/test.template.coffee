@@ -24,15 +24,23 @@ define [
                 expect(tpl).not.to.be null
 
             it 'should contain one interpolation candidate', ->
-                expect(tpl.interpolations.length).to.be 1
+                expect(tpl.attrs.length).to.be 1
 
             it 'should interpolate interpolation candidates', ->
                 tpl.applyContext ctx
                 expect($node.find('a').attr('title')).to.be "Something new"
 
+            it 'should reflect changes in observables', ->
                 ctx.set 'title', "Something old"
                 expect($node.find('a').attr('title')).to.be "Something old"
-                
+
+            it 'should also interpolate text nodes', ->
+                expect($node.find('p').text()).to.be "Something old"
+
+            it 'should reflect changes on text nodes too', ->
+                ctx.set 'title', 'Silly Title Change'
+                expect($node.find('p').text()).to.be "Silly Title Change"
+                expect($node.find('span').text()).to.be "Silly Title Change Silly Title Change"
 
         describe 'context', ->
             context = new Context {

@@ -29,14 +29,18 @@ define (require)->
             super args...
             @Class = lookup @attr 
             
-        applyContext: (context)->
-            app = context.get '$app'
+        applyContext: (parent)->
+            app = parent.root().$app
+            context = parent.new()
+
             @instance = new @Class context: context, app: app
             @instance.init?()
+
             app.addController @Class, @instance
 
             template  = new Template @node
-            template.applyContext context.new()
+            template.applyContext context
+
             console.log "started controller", @instance
 
 

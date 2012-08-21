@@ -1,47 +1,39 @@
 define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context, utils) ->
 
-    DOM_REGEX = /[^>]+>/
-    BINDING_REGEX = /\s(data\-[\w\d\-]+)/gim
-    SUBSTITUTION_REGEX = /#\{(.*?)\}/g
-    BINDINGS = []
+    DOM_REGEX                = /[^>]+>/
+    BINDING_REGEX            = /\s(data\-[\w\d\-]+)/gim
+    SUBSTITUTION_REGEX       = /#\{(.*?)\}/g
+    BINDINGS                 = []
+    INTERPOLATION_ATTRIBUTES = ['title', 'style', 'class', 'alt', 'id']
 
     class Template
-        # A template holds all bindings that need to be rendered. It's
-        # also interpolating all strings in attributes.
-        elementAttrs: ['title', 'style', 'class', 'alt', 'id']
         constructor: (@node)->
-            @bindings = []
-            @callbacks = []
-            @attrs = []
-            @text = []
+            @bindings  = [] # All the bindings following this node
+            @callbacks = [] 
+            @attrs     = [] # All the attribute interpolations
+            @text      = [] # All the text interpolations
+
             @compile()
 
         compileTextNode: (node)->
             return if not (node.nodeType == Node.TEXT_NODE)
             vars = getVars node.textContent
-            if vars.length > 0
-                @text.push
-                    node: node
-                    text: node.textContent
-                    vars: vars
+            return if vars.length == 0 
+            @text.push new TextNode node, vars 
                     
         compileElementAttrs: (node)->
             return if not (node.nodeType == Node.ELEMENT_NODE)
-            for attr in @elementAttrs
+            for attr in INTERPOLATION_ATTRIBUTES
                 continue if not node.attributes[attr]?
-                vars = getVars node.attributes[attr].value 
-                @attrs.push
-                    attr: attr
-                    value: node.attributes[attr].value
-                    vars: vars
-                    node: node
+                vars = getVars node.attributes[attr].value
+                continue if vars.length == 0
+                @attrs.push new Attribute node, attr, vars 
 
         compileElementNode: (node)->
             return if not (node.nodeType == Node.ELEMENT_NODE)
             {stop, bindings} = Binding.init node
             @bindings = @bindings.concat bindings
             return stop 
-            
 
         compile: ()->
             compiler.walk @node, (node, depth)=>
@@ -56,42 +48,35 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         applyContext: (context)->
             for binding in @bindings
                 binding.applyContext context
-            return 
-            if utils.typeOf(context) == "function"
-                for binding in @bindings
-                    binding.applyContext context(binding.node)
-                    
-                for {node, text, vars} in @text
-                    ctx = context node
-                    
-                    node.textContent = substitute text, context node
-                    for pair in vars
-                        console.log "watching", pair.name
-                        context(node).watch pair.name, ->
-                            node.textContent = substitute text, context(node)
-                for {attrName, attrValue, vars, node} in @interpolations
-                    node.attributes[attrName].value = substitute attrValue, context node
-                    for pair in vars
-                        context(node).watch pair.name, ->
-                            node.attributes[attrName].value = substitute attrValue, context(node)
-                            
-            else
-                for binding in @bindings
-                    binding.applyContext context
-                for {node, text, vars} in @text
-                    node.textContent = substitute text, context
-                    for pair in vars
-                        console.log "watching 2", pair.name
-                        context.watch pair.name, ->
-                            console.log "watching 2 running on", pair.name
-                            node.textContent = substitute text, context 
-                for {attrName, attrValue, vars, node} in @interpolations
-                    node.attributes[attrName].value = substitute attrValue, context
-                    for pair in vars
-                        context.watch pair.name, ->
-                            node.attributes[attrName].value = substitute attrValue, context
-            this
+            for attr in @attrs
+                attr.applyContext context
+            for text in @text
+                text.applyContext context 
+            return        
 
+
+    class Attribute
+        constructor: (@node, @attr, @vars)->
+            @value = @node.attributes[@attr].value 
+        substitute: (context)->
+            @node.attributes[@attr].value = substitute @value, context             
+        applyContext: (context)->
+            for {name, raw} in @vars
+                context.watch name, =>
+                    @substitute context 
+            @substitute context
+
+    class TextNode
+        constructor: (@node, @vars)->
+            @text = @node.textContent 
+        substitute: (context)->
+            @node.textContent = substitute @text, context
+        applyContext: (context)->
+            for {name, raw} in @vars
+                context.watch name, => @substitute context
+            @substitute context
+
+            
     class Binding
         # A binding maps a certain functionality to a `data-` attribute
         # on a HTML tag. When creating a binding, call `@bind` with
@@ -118,6 +103,7 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         @getBindings: (node)->
             # Convenience function that returns all the node's binding
             # classes
+            return [] if not (node.nodeType == Node.ELEMENT_NODE)
             tag = node.outerHTML.match DOM_REGEX
             bindings = (b.trim() for b in (tag[0].match(BINDING_REGEX) or []))
             BINDINGS[b] for b in bindings.filter (b)-> BINDINGS[b]?
@@ -176,7 +162,6 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
                 str = str.replace raw, value
             else
                 str = str.replace raw, ''
-
         str 
 
 
