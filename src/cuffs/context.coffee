@@ -158,13 +158,11 @@ define ['./ns', './utils'], (Cuffs, utils) ->
             if not doApply
                 return
 
-            console.log 'set', name, value 
-        
             # If the object we just set on the context is nativ to the
             # current context, call all observers.
             if @hasProp parts[0]
                 return @apply name
-            console.log "travelling up for ", name, value
+
             # If not, travel up the chain of contexts until we find
             # where the object is native and call apply there
             ctx = this

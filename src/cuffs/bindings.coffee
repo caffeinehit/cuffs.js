@@ -34,14 +34,11 @@ define (require)->
             context = parent.new()
 
             @instance = new @Class context: context, app: app
-            @instance.init?()
 
             app.addController @Class, @instance
 
             template  = new Template @node
             template.applyContext context
-
-            console.log "started controller", @instance
 
 
     class DataShow extends Binding
@@ -105,6 +102,9 @@ define (require)->
 
         applyContext: (context)->
             context.watch @attrName, (value)=>
+                if @attr.name == 'nav.search'
+                    console.log "nav.search",value
+                    debugger
                 @toggle value
             @toggle context.get @attrName
             this
@@ -308,7 +308,6 @@ define (require)->
         applyContext: (context)->
             for v in @values
                 context.watch v[0], (value)=>
-                    console.log "handling", v[0], 'with', value, '(', context.get(v[0]), ')'
                     @activate value
 
             $(@node).bind 'click', =>

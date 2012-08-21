@@ -6,7 +6,6 @@ define ["cuffs/compiler"], (compiler)->
                 num = 0
                 compiler.walk walking_the_dom_tree, (node, depth)->
                     if node.nodeType == Node.ELEMENT_NODE
-                        console.log depth, node
                         num += 1
                 expect(num).to.be 8
 

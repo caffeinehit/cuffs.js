@@ -20,6 +20,7 @@ define (require)->
         current
 
     class Application
+        controllers: []
         # Used for looking up controller instances by their
         # constructor
         _controller_ctor: {}
@@ -28,14 +29,14 @@ define (require)->
             @context = new Context $app: this
             @template = new Template @node
             @template.applyContext @context 
-            @callback()
+            @callback(this)
 
         getController: (Klass)->
             @_controller_ctor[Klass]
 
         addController: (Klass, instance)->
+            @controllers.push instance
             @_controller_ctor[Klass] = instance
-
 
         @start: (callback)->
             # Start all applications. If a callback is provided, call
