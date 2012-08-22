@@ -2,3 +2,4 @@ test/*js
 lib/cuffs
 cuffs*.js
 TAGS
+lib/

@@ -32,11 +32,14 @@ task 'develop', 'Run a dev server', ->
     spawn 'xdg-open', ['http://localhost:8888/test/test.html']
 
 
-task 'compile', 'Compile coffee files', ->
+compile = ->
     spawn 'coffee', ['-o', 'lib/', '-c', 'src/']
 
+task 'compile', 'Compile coffee files', ->
+    compile()
 
 task 'build', 'Create files for distribution', ->
+    compile()
     out spawn 'r.js', ['-o', 'buildfiles/normal.js']
     out spawn 'r.js', ['-o', 'buildfiles/minified.js']
 
