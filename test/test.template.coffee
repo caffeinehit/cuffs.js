@@ -1,14 +1,9 @@
-define [
-    'cuffs/compiler',
-    'cuffs/template',
-    'cuffs/context',
-    'cuffs/bindings'
-    ], (
-    compiler,
-    {Template, Binding, render},
-    Context,
-    bindings,
-    )->
+define (require)->
+    compiler                    = require 'cuffs/compiler'
+    {Template, Binding, render} = require 'cuffs/template'
+    Context                     = require 'cuffs/context'
+    bindings                    = require 'cuffs/bindings'
+    $                           = require 'jquery'
 
     get = (name)->
         [$(name), $(name)[0]]
