@@ -17,17 +17,11 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
 
         compileTextNode: (node)->
             return if not (node.nodeType == Node.TEXT_NODE)
-            vars = getVars node.textContent
-            return if vars.length == 0 
-            @text.push new TextNode node, vars 
+            @text = @text.concat TextNode.init node 
                     
         compileElementAttrs: (node)->
             return if not (node.nodeType == Node.ELEMENT_NODE)
-            for attr in INTERPOLATION_ATTRIBUTES
-                continue if not node.attributes[attr]?
-                vars = getVars node.attributes[attr].value
-                continue if vars.length == 0
-                @attrs.push new Attribute node, attr, vars 
+            @attrs = @attrs.concat Attribute.init node 
 
         compileElementNode: (node)->
             return if not (node.nodeType == Node.ELEMENT_NODE)
@@ -56,6 +50,15 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
 
 
     class Attribute
+        @init: (node)->
+            attrs = []
+            for attr in INTERPOLATION_ATTRIBUTES
+                continue if not node.attributes[attr]?
+                vars = getVars node.attributes[attr].value
+                continue if vars.length == 0
+                attrs.push new Attribute node, attr, vars
+            return attrs
+            
         constructor: (@node, @attr, @vars)->
             @value = @node.attributes[@attr].value 
         substitute: (context)->
@@ -67,6 +70,11 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             @substitute context
 
     class TextNode
+        @init: (node)->
+            vars = getVars node.textContent
+            return [] if vars.length == 0
+            return [new TextNode node, vars]
+
         constructor: (@node, @vars)->
             @text = @node.textContent 
         substitute: (context)->
@@ -182,4 +190,6 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         render     : render
         Binding    : Binding
         Template   : Template
+        Attribute  : Attribute
+        TextNode   : TextNode
     }

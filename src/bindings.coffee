@@ -1,7 +1,7 @@
 define (require)->
     Cuffs                           = require './ns'
-    {Binding, Template,
-    optionize, substitute, getVars} = require './template'
+    {Binding, Template, Attribute,
+    optionize, substitute, getVars,} = require './template'
     utils                           = require './utils'
     $                               = require 'jquery'
 
@@ -104,9 +104,6 @@ define (require)->
 
         applyContext: (context)->
             context.watch @attrName, (value)=>
-                if @attr.name == 'nav.search'
-                    console.log "nav.search",value
-                    debugger
                 @toggle value
             @toggle context.get @attrName
             this
@@ -427,6 +424,7 @@ define (require)->
                 # so we have to do that manually
                 {bindings} = Binding.init clone
                 tpl.push binding for binding in bindings
+                tpl.attrs = tpl.attrs.concat Attribute.init clone
 
                 tpl.applyContext ctx
 
