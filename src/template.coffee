@@ -4,7 +4,7 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
     BINDING_REGEX            = /\s(data\-[\w\d\-]+)/gim
     SUBSTITUTION_REGEX       = /#\{(.*?)\}/g
     BINDINGS                 = []
-    INTERPOLATION_ATTRIBUTES = ['title', 'style', 'class', 'alt', 'id']
+    INTERPOLATION_ATTRIBUTES = ['title', 'style', 'class', 'alt', 'id', 'href']
 
     class Template
         constructor: (@node)->
