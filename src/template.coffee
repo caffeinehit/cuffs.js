@@ -40,12 +40,12 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             @bindings.push binding
 
         applyContext: (context)->
-            for binding in @bindings
-                binding.applyContext context
-            for attr in @attrs
-                attr.applyContext context
             for text in @text
                 text.applyContext context 
+            for attr in @attrs
+                attr.applyContext context
+            for binding in @bindings
+                binding.applyContext context
             return        
 
 
