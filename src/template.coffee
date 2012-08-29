@@ -3,7 +3,8 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
     DOM_REGEX                = /[^>]+>/
     BINDING_REGEX            = /\s(data\-[\w\d\-]+)/gim
     SUBSTITUTION_REGEX       = /#\{(.*?)\}/g
-    BINDINGS                 = []
+    BINDINGS                 = {}
+    FILTERS                  = {}
     INTERPOLATION_ATTRIBUTES = ['title', 'style', 'class', 'alt', 'id', 'href']
 
     class Template
@@ -83,6 +84,20 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
             for {name, raw} in @vars
                 context.watch name, => @substitute context
             @substitute context
+
+    class Filter
+        # Apply transformation to variables coming from the context.
+        # Works very similar to bindings.
+        @bind: (name, fn)->
+            FILTERS[name] = fn
+        
+        @get: (name)->
+            FILTERS[name]
+
+    Filter.bind 'urlize', (text)->
+        re = /(https*:\/\/[^\s]+)/g
+        text.replace(re, """<a href="$1" target="_blank" rel="nofollow">$1</a>""")
+
 
             
     class Binding
@@ -165,7 +180,13 @@ define ['./ns', './compiler', './context', './utils'], (Cuffs, compiler, Context
         vars = getVars str
 
         for {raw, name} in vars
+            [name, filters...] = name.split('|')
+
             value = context.get name
+
+            for filter in filters
+                value = Filter.get(filter) value 
+
             if value?
                 str = str.replace raw, value
             else
