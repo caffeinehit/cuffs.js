@@ -1,9 +1,9 @@
 define (require)->
-    Cuffs                           = require './ns'
+    Cuffs                            = require './ns'
     {Binding, Template, Attribute,
     optionize, substitute, getVars,} = require './template'
-    utils                           = require './utils'
-    $                               = require 'jquery'
+    utils                            = require './utils'
+
 
 
     # Looks up objects on the global classpath, eg:

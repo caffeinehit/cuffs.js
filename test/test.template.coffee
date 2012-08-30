@@ -3,7 +3,7 @@ define (require)->
     {Template, Binding, render} = require 'cuffs/template'
     Context                     = require 'cuffs/context'
     bindings                    = require 'cuffs/bindings'
-    $                           = require 'jquery'
+
 
     get = (name)->
         [$(name), $(name)[0]]
